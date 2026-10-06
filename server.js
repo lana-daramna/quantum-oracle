@@ -221,8 +221,6 @@ You are entertaining, intelligent, mysterious, confident, and funny.
 The quantum engine has ALREADY decided the result.
 Your only job is to phrase that result naturally.
 
-Personality and energy affect ONLY your tone.
-
 You will be given either:
 - "Chosen answer: <X>" -> the visitor asked a two-choice question. Announce X clearly as the winner. Never switch it, never invent a third option.
 - "Quantum decision: YES/NO" -> answer the question according to that decision.
@@ -516,18 +514,23 @@ Return only the short Oracle answer.
 // ---------- EMAIL REDESIGN (LIGHT THEME — EN + AR) ----------
 // ============================================================
 
-// Small logo (240px) sent as an inline attachment (cid:) so it never depends
-// on FRONTEND_URL being publicly reachable.
 const LOGO_CID = 'qcc-logo';
 let LOGO_B64 = '';
+
 try {
   LOGO_B64 = fs
     .readFileSync(
-      new URL('./public/qcc-logo-email.png', import.meta.url)
+      new URL(
+        './public/qcc-logo-email.png',
+        import.meta.url
+      )
     )
     .toString('base64');
 } catch (e) {
-  console.error('[email] logo not loaded:', e.message);
+  console.error(
+    '[email] logo not loaded:',
+    e.message
+  );
 }
 
 const esc = (s) =>
@@ -543,7 +546,7 @@ const esc = (s) =>
       })[c]
   );
 
-// ---------- Brand palette (light + purple) ----------
+// ---------- Brand palette ----------
 const C = {
   purple: '#6D28D9',
   darkPurple: '#4C1D95',
@@ -560,7 +563,7 @@ const C = {
   gold: '#F59E0B',
 };
 
-// ---------- Playful quips under the answer ----------
+// ---------- Playful quips ----------
 const QUIPS = {
   en: [
     'The qubits have voted. Appeals are not accepted.',
@@ -574,6 +577,7 @@ const QUIPS = {
     'The qubits have opinions.',
     'Democracy was not involved in this decision.',
   ],
+
   ar: [
     'الكيوبتات صوّتت. ما في استئناف.',
     'شفت هالخط الزمني قبل هيك.',
@@ -597,18 +601,21 @@ const FACTS = {
       c: 'In 2016, IBM put a real quantum computer online so anyone could try it from a browser.',
       h: 'What would you ask it?',
     },
+
     {
       t: 'Qubits grow at crazy speed',
       f: '2 qubits give 4 possible outcomes, just like your Oracle. 50 qubits give over a quadrillion.',
       c: 'Quantum machines are rare and expensive, so the cloud lets thousands of students share them.',
       h: 'Guess how many we could fit in your pocket?',
     },
+
     {
       t: 'Colder than outer space',
       f: 'Many quantum chips run just a few hundredths of a degree above absolute zero — far colder than deep space.',
       c: 'You will not keep one in your dorm, so you reach it through the cloud instead.',
       h: 'Want to run a circuit on one?',
     },
+
     {
       t: 'Quantum in a few lines of Python',
       f: 'The circuit behind your answer takes only a few lines of code in Qiskit, an open-source toolkit.',
@@ -616,6 +623,7 @@ const FACTS = {
       h: 'Curious how it looks?',
     },
   ],
+
   ar: [
     {
       t: 'كيوبت واحد وجوابين بنفس الوقت',
@@ -623,18 +631,21 @@ const FACTS = {
       c: 'سنة 2016 وضعت IBM حاسوباً كمّياً حقيقياً على الإنترنت ليجرّبه أي حدا من المتصفح.',
       h: 'شو كنت رح تسأله؟',
     },
+
     {
       t: 'الكيوبتات بتكبر بسرعة مجنونة',
       f: 'كيوبتين بيعطوا 4 نتائج ممكنة، متل العرّاف تبعك. و50 كيوبت بيعطوا أكتر من مليون مليار نتيجة.',
       c: 'الأجهزة الكمّية نادرة وغالية، فالـ cloud بيخلّي آلاف الطلاب يتشاركوها.',
       h: 'خمّن كم كيوبت بنقدر نحط بجيبك؟',
     },
+
     {
       t: 'أبرد من الفضاء الخارجي',
       f: 'كتير من الرقائق الكمّية بتشتغل على درجة أعلى بشوية من الصفر المطلق — أبرد بكتير من الفضاء العميق.',
       c: 'مش رح تحطها بغرفتك، فبنوصلها عن طريق الـ cloud.',
       h: 'بدك تشغّل دارة عليها؟',
     },
+
     {
       t: 'الكمّ بكم سطر Python',
       f: 'الدارة اللي طلع منها جوابك بتكتبها بكم سطر بس بـ Qiskit، أداة مفتوحة المصدر.',
@@ -649,93 +660,167 @@ const L = {
   en: {
     dir: 'ltr',
     align: 'left',
+
     font:
       "-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif",
 
-    brandSmall: 'BIRZEIT UNIVERSITY · QISKIT FALL FEST 2026',
-    gameTitle: 'QUANTUM ORACLE',
-    heroLine: 'The quantum circuit has spoken.',
-    heroSub: 'A Decade on the Cloud',
+    brandSmall:
+      'BIRZEIT UNIVERSITY · QISKIT FALL FEST 2026',
 
-    greeting: (n) => `Hey ${n} 👋`,
+    gameTitle:
+      'QUANTUM ORACLE',
+
+    heroLine:
+      'The quantum circuit has spoken.',
+
+    heroSub:
+      'A Decade on the Cloud',
+
+    greeting: (n) =>
+      `Hey ${n} 👋`,
+
     greetMsg:
       "We're so happy you joined us at Qiskit Fall Fest 2026! Thank you for trusting the Oracle with your question.",
 
-    qLabel: 'YOUR QUESTION',
-    answerLabel: '🔮 THE ORACLE HAS SPOKEN',
+    qLabel:
+      'YOUR QUESTION',
 
-    resultLabel: '⚛️ QUANTUM RESULT',
-    stateLabel: 'QUANTUM STATE',
-    oracleLabel: 'ORACLE',
-    energyLabel: 'ENERGY',
+    answerLabel:
+      '🔮 THE ORACLE HAS SPOKEN',
 
-    funLabel: '🎲 IN PLAIN WORDS',
+    resultLabel:
+      '⚛️ QUANTUM RESULT',
+
+    stateLabel:
+      'QUANTUM STATE',
+
+    oracleLabel:
+      'ORACLE',
+
+    energyLabel:
+      'ENERGY',
+
+    funLabel:
+      '🎲 IN PLAIN WORDS',
+
     funText: (s) =>
       `Two qubits, four possible states, one decision. Somewhere between |0⟩ and |1⟩, your answer took shape — state <b style="color:${C.darkPurple}">|${s}⟩</b> was the one that survived the measurement.`,
 
-    dykLabel: '🧠 DID YOU KNOW?',
+    dykLabel:
+      '🧠 DID YOU KNOW?',
 
-    cloudLabel: '☁️ FROM QUBITS TO THE CLOUD',
+    cloudLabel:
+      '☁️ FROM QUBITS TO THE CLOUD',
+
     cloudText:
       'Your Oracle ran as a cloud-powered experience — bringing quantum ideas out of the lab and into your hands. No lab coat required.',
 
-    ctaLabel: 'WANT TO GO DEEPER?',
-    ctaBtn: 'EXPLORE QUANTUM →',
-    ctaSub: 'Bring a friend and bring your curiosity.',
+    ctaLabel:
+      'WANT TO GO DEEPER?',
 
-    qiskitLink: 'Try Qiskit yourself',
+    ctaBtn:
+      'EXPLORE QUANTUM →',
 
-    footerOrg: 'Quantum Computing Club',
-    footerUni: 'Birzeit University',
+    ctaSub:
+      'Bring a friend and bring your curiosity.',
+
+    qiskitLink:
+      'Try Qiskit yourself',
+
+    footerOrg:
+      'Quantum Computing Club',
+
+    footerUni:
+      'Birzeit University',
+
     footerNote:
       'A fun, educational, quantum-inspired simulation. It does not predict the future or decide what is true.',
 
+    footerCredit:
+      'Game Developer: Lana Daramna',
   },
 
   ar: {
     dir: 'rtl',
     align: 'right',
+
     font:
       "Tahoma,'Segoe UI',Arial,sans-serif",
 
-    brandSmall: 'جامعة بيرزيت · Qiskit Fall Fest 2026',
-    gameTitle: 'العرّاف الكمّي',
-    heroLine: 'الدارة الكمّية حكت.',
-    heroSub: 'عقد على الـ Cloud',
+    brandSmall:
+      'جامعة بيرزيت · Qiskit Fall Fest 2026',
 
-    greeting: (n) => `يا هلا ${n} 👋`,
+    gameTitle:
+      'العرّاف الكمّي',
+
+    heroLine:
+      'الدارة الكمّية حكت.',
+
+    heroSub:
+      'عقد على الـ Cloud',
+
+    greeting: (n) =>
+      `يا هلا ${n} 👋`,
+
     greetMsg:
       'كتير سعيدين إنك كنت معنا بـ Qiskit Fall Fest 2026! شكراً إلك لأنك مرّيت وسألت العرّاف سؤالك.',
 
-    qLabel: 'سؤالك',
-    answerLabel: '🔮 العرّاف حكى كلمته',
+    qLabel:
+      'سؤالك',
 
-    resultLabel: '⚛️ النتيجة الكمّية',
-    stateLabel: 'الحالة',
-    oracleLabel: 'العرّاف',
-    energyLabel: 'الطاقة',
+    answerLabel:
+      '🔮 العرّاف حكى كلمته',
 
-    funLabel: '🎲 بالعربي المبسّط',
+    resultLabel:
+      '⚛️ النتيجة الكمّية',
+
+    stateLabel:
+      'الحالة',
+
+    oracleLabel:
+      'العرّاف',
+
+    energyLabel:
+      'الطاقة',
+
+    funLabel:
+      '🎲 بالعربي المبسّط',
+
     funText: (s) =>
       `كيوبتين، أربع حالات ممكنة، وقرار واحد. بين |0⟩ و|1⟩، جوابك أخد شكله — الحالة <b style="color:${C.darkPurple}" dir="ltr">|${s}⟩</b> هي اللي نجت من القياس.`,
 
-    dykLabel: '🧠 هل تعلم؟',
+    dykLabel:
+      '🧠 هل تعلم؟',
 
-    cloudLabel: '☁️ من الكيوبتات للـ Cloud',
+    cloudLabel:
+      '☁️ من الكيوبتات للـ Cloud',
+
     cloudText:
       'العرّاف تبعك اشتغل كتجربة مدعومة بالـ cloud — بيطلّع أفكار الكمّ من المختبر لأيديك. مش لازمك روب المختبر.',
 
-    ctaLabel: 'بدك تغوص أعمق؟',
-    ctaBtn: '← استكشف الكمّ',
-    ctaSub: 'جيب معك صاحبك وجيب معك فضولك.',
+    ctaLabel:
+      'بدك تغوص أعمق؟',
 
-    qiskitLink: 'جرّب Qiskit بنفسك',
+    ctaBtn:
+      '← استكشف الكمّ',
 
-    footerOrg: 'نادي الحوسبة الكمّية',
-    footerUni: 'جامعة بيرزيت',
+    ctaSub:
+      'جيب معك صاحبك وجيب معك فضولك.',
+
+    qiskitLink:
+      'جرّب Qiskit بنفسك',
+
+    footerOrg:
+      'نادي الحوسبة الكمّية',
+
+    footerUni:
+      'جامعة بيرزيت',
+
     footerNote:
       'تجربة ترفيهية تعليمية مبنية على محاكاة كمّية. هي مش تنبؤ بالمستقبل وما بتقرر شو الصح.',
-    
+
+    footerCredit:
+      'مطوّرة اللعبة: Lana Daramna',
   },
 };
 
@@ -767,7 +852,6 @@ const ENERGY_EN = (e) =>
     .slice(1)
     .toLowerCase();
 
-// Deterministic pick per session id
 const factIndex = (id, n) =>
   parseInt(
     String(id || '0')
@@ -777,9 +861,13 @@ const factIndex = (id, n) =>
   ) % n;
 
 // ------------------------------------------------------------
-// Build Email (unified EN + AR)
+// Build Email
 // ------------------------------------------------------------
-export function buildEmail(session, visitor, env = {}) {
+export function buildEmail(
+  session,
+  visitor,
+  env = {}
+) {
   const lang = isArabic(session.question)
     ? 'ar'
     : 'en';
@@ -789,7 +877,12 @@ export function buildEmail(session, visitor, env = {}) {
   const quips = QUIPS[lang];
 
   const fact =
-    facts[factIndex(session.id, facts.length)];
+    facts[
+      factIndex(
+        session.id,
+        facts.length
+      )
+    ];
 
   const quip =
     quips[
@@ -799,16 +892,14 @@ export function buildEmail(session, visitor, env = {}) {
       )
     ];
 
-  const base = String(
-    env.FRONTEND_URL || ''
-  ).replace(/\/$/, '');
-
   const ev = esc(
-    env.EVENT_NAME || 'Qiskit Fall Fest 2026'
+    env.EVENT_NAME ||
+      'Qiskit Fall Fest 2026'
   );
 
   const theme = esc(
-    env.EVENT_THEME || 'A Decade on the Cloud'
+    env.EVENT_THEME ||
+      'A Decade on the Cloud'
   );
 
   const name = esc(visitor.name);
@@ -824,24 +915,38 @@ export function buildEmail(session, visitor, env = {}) {
 
   const energy = esc(
     lang === 'ar'
-      ? ENERGY_AR[session.oracleEnergy] ||
+      ? ENERGY_AR[
           session.oracleEnergy
-      : ENERGY_EN(session.oracleEnergy)
+        ] ||
+        session.oracleEnergy
+      : ENERGY_EN(
+          session.oracleEnergy
+        )
   );
 
-  const { dir, align, font } = t;
+  const {
+    dir,
+    align,
+    font,
+  } = t;
 
-  // ---------- Small reusable UI ----------
-  const statCard = (icon, label, value, mono) => `
+  const statCard = (
+    icon,
+    label,
+    value,
+    mono
+  ) => `
     <td valign="top" width="33.33%" style="padding:0 4px">
       <table role="presentation" width="100%" cellpadding="0" cellspacing="0"
         style="background:${C.white};border-radius:14px;border:1px solid ${C.cardBorder}">
         <tr>
           <td align="center" style="padding:16px 8px 14px;text-align:center">
             <div style="font-size:20px;line-height:1">${icon}</div>
+
             <div style="font-size:10px;font-weight:bold;letter-spacing:1.2px;color:${C.muted};margin-top:8px;text-transform:uppercase">
               ${label}
             </div>
+
             <div style="font-size:15px;font-weight:bold;color:${C.darkPurple};margin-top:6px;${
               mono
                 ? 'font-family:monospace;direction:ltr;'
@@ -854,51 +959,87 @@ export function buildEmail(session, visitor, env = {}) {
       </table>
     </td>`;
 
-  const ctaBlock = env.EVENT_QR_URL
-    ? `
+  const ctaBlock =
+    env.EVENT_QR_URL
+      ? `
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
-    <tr>
-      <td align="center" style="padding:30px 24px 8px">
-        <div style="font-size:12px;font-weight:bold;letter-spacing:1.5px;color:${C.purple};text-transform:uppercase;margin-bottom:14px">
-          ${t.ctaLabel}
-        </div>
-        <table role="presentation" cellpadding="0" cellspacing="0">
-          <tr>
-            <td align="center" bgcolor="${C.purple}"
-              style="background:${C.purple};border-radius:999px">
-              <a href="${esc(env.EVENT_QR_URL)}"
-                style="display:inline-block;padding:15px 34px;font-size:15px;font-weight:bold;color:${C.white};text-decoration:none;letter-spacing:0.5px;border-radius:999px">
-                ${t.ctaBtn}
-              </a>
-            </td>
-          </tr>
-        </table>
-        <div style="font-size:13px;color:${C.muted};margin-top:14px">
-          ${t.ctaSub}
-        </div>
-      </td>
-    </tr>
-    </table>`
-    : '';
+      <tr>
+        <td align="center" style="padding:30px 24px 8px">
 
-  // ---------- HTML ----------
+          <div style="font-size:12px;font-weight:bold;letter-spacing:1.5px;color:${C.purple};text-transform:uppercase;margin-bottom:14px">
+            ${t.ctaLabel}
+          </div>
+
+          <table role="presentation" cellpadding="0" cellspacing="0">
+            <tr>
+              <td align="center" bgcolor="${C.purple}"
+                style="background:${C.purple};border-radius:999px">
+
+                <a href="${esc(env.EVENT_QR_URL)}"
+                  style="display:inline-block;padding:15px 34px;font-size:15px;font-weight:bold;color:${C.white};text-decoration:none;letter-spacing:0.5px;border-radius:999px">
+                  ${t.ctaBtn}
+                </a>
+
+              </td>
+            </tr>
+          </table>
+
+          <div style="font-size:13px;color:${C.muted};margin-top:14px">
+            ${t.ctaSub}
+          </div>
+
+        </td>
+      </tr>
+    </table>`
+      : '';
+
   const html = `
 <!DOCTYPE html>
 <html lang="${lang}" dir="${dir}">
 <head>
+
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="color-scheme" content="light">
-<title>${esc(
+
+<meta
+  name="viewport"
+  content="width=device-width,initial-scale=1"
+>
+
+<meta
+  name="color-scheme"
+  content="light"
+>
+
+<title>
+  ${esc(
     lang === 'ar'
       ? `🔮 ${visitor.name}، العرّاف الكمّي حكى!`
       : `🔮 ${visitor.name}, the Oracle has spoken!`
-  )}</title>
+  )}
+</title>
+
 </head>
 
-<body style="margin:0;padding:0;background:${C.pageBg};font-family:${font};color:${C.text};-webkit-text-size-adjust:100%">
+<body
+  style="
+    margin:0;
+    padding:0;
+    background:${C.pageBg};
+    font-family:${font};
+    color:${C.text};
+    -webkit-text-size-adjust:100%;
+  "
+>
 
-<div style="display:none;max-height:0;overflow:hidden;opacity:0;color:${C.pageBg}">
+<div
+  style="
+    display:none;
+    max-height:0;
+    overflow:hidden;
+    opacity:0;
+    color:${C.pageBg};
+  "
+>
   ${esc(
     lang === 'ar'
       ? 'جوابك جوّا، ومعك معلومة كمّية.'
@@ -906,308 +1047,987 @@ export function buildEmail(session, visitor, env = {}) {
   )}
 </div>
 
-<table role="presentation" width="100%" cellpadding="0" cellspacing="0" bgcolor="${C.pageBg}" style="background:${C.pageBg}">
+<table
+  role="presentation"
+  width="100%"
+  cellpadding="0"
+  cellspacing="0"
+  bgcolor="${C.pageBg}"
+  style="background:${C.pageBg}"
+>
+
 <tr>
-<td align="center" style="padding:24px 12px">
 
-  <table role="presentation" width="600" cellpadding="0" cellspacing="0" dir="${dir}" style="width:100%;max-width:600px">
+<td
+  align="center"
+  style="padding:24px 12px"
+>
 
-    <!-- HERO -->
-    <tr>
-      <td align="center"
-        style="background:${C.purple};background-image:linear-gradient(135deg,${C.purple} 0%,${C.darkPurple} 100%);border-radius:24px 24px 0 0;padding:34px 28px 30px;text-align:center">
-        ${
-          LOGO_B64
-            ? `<img src="cid:${LOGO_CID}" width="80" height="80" alt="Quantum Computing Club"
-                style="display:block;margin:0 auto 14px;border:0;border-radius:50%;width:80px;height:80px">`
-            : ''
-        }
-        <div style="display:inline-block;background:rgba(255,255,255,0.18);color:#EDE9FE;font-size:10px;font-weight:bold;letter-spacing:1.5px;padding:7px 16px;border-radius:999px;text-transform:uppercase">
-          ${t.brandSmall}
-        </div>
-        <div style="font-size:38px;font-weight:900;color:#FFFFFF;letter-spacing:1.5px;margin-top:18px;line-height:1.15">
-          ${t.gameTitle}
-        </div>
-        <div style="font-size:16px;color:#E9DFFF;margin-top:12px;line-height:1.5;font-weight:500">
-          ${t.heroLine}
-        </div>
-        <div style="font-size:11px;color:#C7B3F2;letter-spacing:2px;text-transform:uppercase;margin-top:14px">
-          ${t.heroSub}
-        </div>
-        <div dir="ltr" style="font-size:16px;color:#D5C4F7;letter-spacing:8px;margin-top:18px;line-height:1;direction:ltr;unicode-bidi:isolate">
-          &#10216;0| &nbsp;&nbsp; &#10216;1|
-        </div>
-      </td>
-    </tr>
+<table
+  role="presentation"
+  width="600"
+  cellpadding="0"
+  cellspacing="0"
+  dir="${dir}"
+  style="width:100%;max-width:600px"
+>
 
-    <!-- BODY CARD -->
-    <tr>
-      <td style="background:${C.white};border-radius:0 0 24px 24px;border:1px solid ${C.cardBorder};border-top:none">
+<!-- HERO -->
 
-        <!-- GREETING -->
-        <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
-          <tr>
-            <td style="padding:34px 32px 6px;text-align:${align}">
-              <div style="font-size:26px;font-weight:800;color:${C.darkPurple};line-height:1.3">
-                ${t.greeting(name)}
-              </div>
-              <div style="font-size:15px;line-height:1.7;color:${C.muted};margin-top:10px">
-                ${t.greetMsg}
-              </div>
-            </td>
-          </tr>
-        </table>
+<tr>
 
-        <!-- YOUR QUESTION -->
-        <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
-          <tr>
-            <td style="padding:22px 32px 0;text-align:${align}">
-              <div style="font-size:11px;font-weight:bold;letter-spacing:1.5px;color:${C.muted};text-transform:uppercase;margin-bottom:10px">
-                ${t.qLabel}
-              </div>
-              <table role="presentation" width="100%" cellpadding="0" cellspacing="0"
-                style="background:${C.lightLavender};border-radius:16px;border:1px solid ${C.lavender}">
-                <tr>
-                  <td style="padding:18px 22px;text-align:${align}">
-                    <div style="font-size:17px;line-height:1.6;color:${C.text};font-weight:500;font-style:italic">
-                      “${q}”
-                    </div>
-                  </td>
-                </tr>
-              </table>
-            </td>
-          </tr>
-        </table>
+<td
+  align="center"
+  style="
+    background:${C.purple};
+    background-image:linear-gradient(
+      135deg,
+      ${C.purple} 0%,
+      ${C.darkPurple} 100%
+    );
+    border-radius:24px 24px 0 0;
+    padding:34px 28px 30px;
+    text-align:center
+  "
+>
 
-        <!-- ORACLE ANSWER -->
-        <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
-          <tr>
-            <td style="padding:26px 24px 0">
-              <table role="presentation" width="100%" cellpadding="0" cellspacing="0"
-                style="background:${C.purple};background-image:linear-gradient(135deg,${C.purple} 0%,${C.darkPurple} 100%);border-radius:22px">
-                <tr>
-                  <td align="center" style="padding:36px 26px 34px;text-align:center">
-                    <div style="font-size:12px;font-weight:bold;letter-spacing:2.5px;color:#E9DFFF;text-transform:uppercase">
-                      ${t.answerLabel}
-                    </div>
-                    <div style="font-size:34px;font-weight:900;color:#FFFFFF;line-height:1.25;margin-top:18px;letter-spacing:0.3px">
-                      ${ans}
-                    </div>
-                    <div style="height:2px;width:60px;background:rgba(255,255,255,0.35);margin:22px auto 0;border-radius:2px"></div>
-                    <div style="font-size:14px;color:#E5D8FF;margin-top:18px;line-height:1.6;font-style:italic">
-                      ${esc(quip)}
-                    </div>
-                  </td>
-                </tr>
-              </table>
-            </td>
-          </tr>
-        </table>
+${
+  LOGO_B64
+    ? `
+<img
+  src="cid:${LOGO_CID}"
+  width="80"
+  height="80"
+  alt="Quantum Computing Club"
+  style="
+    display:block;
+    margin:0 auto 14px;
+    border:0;
+    border-radius:50%;
+    width:80px;
+    height:80px
+  "
+>
+`
+    : ''
+}
 
-        <!-- QUANTUM RESULT -->
-        <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
-          <tr>
-            <td style="padding:30px 32px 0;text-align:${align}">
-              <div style="font-size:12px;font-weight:bold;letter-spacing:1.5px;color:${C.muted};text-transform:uppercase;margin-bottom:14px">
-                ${t.resultLabel}
-              </div>
-            </td>
-          </tr>
-        </table>
+<div
+  style="
+    display:inline-block;
+    background:rgba(255,255,255,0.18);
+    color:#EDE9FE;
+    font-size:10px;
+    font-weight:bold;
+    letter-spacing:1.5px;
+    padding:7px 16px;
+    border-radius:999px;
+    text-transform:uppercase
+  "
+>
+  ${t.brandSmall}
+</div>
 
-        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="padding:0 28px">
-          <tr>
-            ${statCard('⚛️', t.stateLabel, `|${s}⟩`, true)}
-            ${statCard('🔮', t.oracleLabel, pers, false)}
-            ${statCard('⚡', t.energyLabel, energy, false)}
-          </tr>
-        </table>
+<div
+  style="
+    font-size:38px;
+    font-weight:900;
+    color:#FFFFFF;
+    letter-spacing:1.5px;
+    margin-top:18px;
+    line-height:1.15
+  "
+>
+  ${t.gameTitle}
+</div>
 
-        <!-- PLAIN WORDS -->
-        <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
-          <tr>
-            <td style="padding:24px 32px 0">
-              <table role="presentation" width="100%" cellpadding="0" cellspacing="0"
-                style="background:${C.lightLavender};border-radius:14px;border:1px dashed ${C.lavender}">
-                <tr>
-                  <td style="padding:18px 22px;text-align:${align}">
-                    <div style="font-size:11px;font-weight:bold;letter-spacing:1.5px;color:${C.purple};text-transform:uppercase;margin-bottom:8px">
-                      ${t.funLabel}
-                    </div>
-                    <div style="font-size:14px;line-height:1.7;color:${C.text}">
-                      ${t.funText(s)}
-                    </div>
-                  </td>
-                </tr>
-              </table>
-            </td>
-          </tr>
-        </table>
+<div
+  style="
+    font-size:16px;
+    color:#E9DFFF;
+    margin-top:12px;
+    line-height:1.5;
+    font-weight:500
+  "
+>
+  ${t.heroLine}
+</div>
 
-        <!-- DID YOU KNOW -->
-        <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
-          <tr>
-            <td style="padding:26px 32px 0">
-              <table role="presentation" width="100%" cellpadding="0" cellspacing="0"
-                style="background:#FEF9EE;border:1px solid #FDE9BF;border-radius:16px">
-                <tr>
-                  <td style="padding:22px 24px;text-align:${align}">
-                    <div style="font-size:12px;font-weight:bold;letter-spacing:1.5px;color:${C.gold};text-transform:uppercase">
-                      ${t.dykLabel}
-                    </div>
-                    <div style="font-size:18px;font-weight:800;color:${C.darkPurple};margin-top:10px;line-height:1.35">
-                      ${esc(fact.t)}
-                    </div>
-                    <div style="font-size:14px;line-height:1.7;color:${C.text};margin-top:10px">
-                      ${esc(fact.f)}
-                    </div>
-                    <div style="font-size:13px;line-height:1.7;color:${C.blue};margin-top:12px;background:${C.lightBlue};padding:12px 14px;border-radius:10px;border:1px solid #BAE6FD">
-                      <b>☁️</b> ${esc(fact.c)}
-                    </div>
-                    <div style="font-size:14px;font-weight:bold;color:${C.purple};margin-top:14px">
-                      ${esc(fact.h)}
-                    </div>
-                  </td>
-                </tr>
-              </table>
-            </td>
-          </tr>
-        </table>
+<div
+  style="
+    font-size:11px;
+    color:#C7B3F2;
+    letter-spacing:2px;
+    text-transform:uppercase;
+    margin-top:14px
+  "
+>
+  ${t.heroSub}
+</div>
 
-        <!-- CLOUD -->
-        <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
-          <tr>
-            <td style="padding:26px 32px 0">
-              <table role="presentation" width="100%" cellpadding="0" cellspacing="0"
-                style="background:${C.lightBlue};background-image:linear-gradient(135deg,${C.lightBlue} 0%,#F0F9FF 100%);border-radius:16px;border:1px solid #BAE6FD">
-                <tr>
-                  <td style="padding:22px 24px;text-align:${align}">
-                    <div style="font-size:12px;font-weight:bold;letter-spacing:1.5px;color:${C.blue};text-transform:uppercase">
-                      ${t.cloudLabel}
-                    </div>
-                    <div style="font-size:17px;font-weight:800;color:${C.blue};margin-top:8px;line-height:1.35">
-                      ${theme}
-                    </div>
-                    <div style="font-size:14px;line-height:1.7;color:#0C4A6E;margin-top:10px">
-                      ${t.cloudText}
-                    </div>
-                  </td>
-                </tr>
-              </table>
-            </td>
-          </tr>
-        </table>
-
-        <!-- CTA -->
-        ${ctaBlock}
-
-        <!-- QISKIT LINK -->
-        <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
-          <tr>
-            <td align="center" style="padding:22px 32px 0">
-              <a href="https://qiskit.org" style="color:${C.purple};font-size:14px;font-weight:bold;text-decoration:underline">
-                ${t.qiskitLink}
-              </a>
-            </td>
-          </tr>
-        </table>
-
-        <!-- FOOTER -->
-        <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
-          <tr>
-            <td style="padding:30px 32px 34px;text-align:${align}">
-              <div style="border-top:1px solid ${C.cardBorder};padding-top:20px">
-                <div style="font-size:14px;font-weight:800;color:${C.darkPurple};line-height:1.4">
-                  ${t.footerOrg}
-                </div>
-                <div style="font-size:13px;color:${C.muted};margin-top:2px">
-                  ${t.footerUni}
-                </div>
-                <div style="font-size:12px;color:${C.muted};line-height:1.8;margin-top:14px">
-                  <span style="color:${C.purple};font-weight:bold">${ev}</span>
-                  · ${theme}
-                </div>
-                <div style="font-size:12px;color:${C.muted};margin-top:14px;line-height:1.7">
-                  ${t.footerNote}
-                </div>
-                <div style="font-size:13px;font-weight:bold;color:${C.darkPurple};margin-top:16px">
-                  ✨ ${t.footerCredit}
-                </div>
-              </div>
-            </td>
-          </tr>
-        </table>
-
-      </td>
-    </tr>
-
-    <tr>
-      <td align="center" style="padding:18px 12px 0;font-size:11px;color:${C.muted}">
-        &nbsp;
-      </td>
-    </tr>
-
-  </table>
+<div
+  dir="ltr"
+  style="
+    font-size:16px;
+    color:#D5C4F7;
+    letter-spacing:8px;
+    margin-top:18px;
+    line-height:1;
+    direction:ltr;
+    unicode-bidi:isolate
+  "
+>
+  &#10216;0| &nbsp;&nbsp; &#10216;1|
+</div>
 
 </td>
+
 </tr>
+
+<!-- BODY CARD -->
+
+<tr>
+
+<td
+  style="
+    background:${C.white};
+    border-radius:0 0 24px 24px;
+    border:1px solid ${C.cardBorder};
+    border-top:none
+  "
+>
+
+<!-- GREETING -->
+
+<table
+  role="presentation"
+  width="100%"
+  cellpadding="0"
+  cellspacing="0"
+>
+
+<tr>
+
+<td
+  style="
+    padding:34px 32px 6px;
+    text-align:${align}
+  "
+>
+
+<div
+  style="
+    font-size:26px;
+    font-weight:800;
+    color:${C.darkPurple};
+    line-height:1.3
+  "
+>
+  ${t.greeting(name)}
+</div>
+
+<div
+  style="
+    font-size:15px;
+    line-height:1.7;
+    color:${C.muted};
+    margin-top:10px
+  "
+>
+  ${t.greetMsg}
+</div>
+
+</td>
+
+</tr>
+
+</table>
+
+<!-- QUESTION -->
+
+<table
+  role="presentation"
+  width="100%"
+  cellpadding="0"
+  cellspacing="0"
+>
+
+<tr>
+
+<td
+  style="
+    padding:22px 32px 0;
+    text-align:${align}
+  "
+>
+
+<div
+  style="
+    font-size:11px;
+    font-weight:bold;
+    letter-spacing:1.5px;
+    color:${C.muted};
+    text-transform:uppercase;
+    margin-bottom:10px
+  "
+>
+  ${t.qLabel}
+</div>
+
+<table
+  role="presentation"
+  width="100%"
+  cellpadding="0"
+  cellspacing="0"
+  style="
+    background:${C.lightLavender};
+    border-radius:16px;
+    border:1px solid ${C.lavender}
+  "
+>
+
+<tr>
+
+<td
+  style="
+    padding:18px 22px;
+    text-align:${align}
+  "
+>
+
+<div
+  style="
+    font-size:17px;
+    line-height:1.6;
+    color:${C.text};
+    font-weight:500;
+    font-style:italic
+  "
+>
+  “${q}”
+</div>
+
+</td>
+
+</tr>
+
+</table>
+
+</td>
+
+</tr>
+
+</table>
+
+<!-- ORACLE ANSWER -->
+
+<table
+  role="presentation"
+  width="100%"
+  cellpadding="0"
+  cellspacing="0"
+>
+
+<tr>
+
+<td
+  style="
+    padding:26px 24px 0
+  "
+>
+
+<table
+  role="presentation"
+  width="100%"
+  cellpadding="0"
+  cellspacing="0"
+  style="
+    background:${C.purple};
+    background-image:linear-gradient(
+      135deg,
+      ${C.purple} 0%,
+      ${C.darkPurple} 100%
+    );
+    border-radius:22px
+  "
+>
+
+<tr>
+
+<td
+  align="center"
+  style="
+    padding:36px 26px 34px;
+    text-align:center
+  "
+>
+
+<div
+  style="
+    font-size:12px;
+    font-weight:bold;
+    letter-spacing:2.5px;
+    color:#E9DFFF;
+    text-transform:uppercase
+  "
+>
+  ${t.answerLabel}
+</div>
+
+<div
+  style="
+    font-size:34px;
+    font-weight:900;
+    color:#FFFFFF;
+    line-height:1.25;
+    margin-top:18px;
+    letter-spacing:0.3px
+  "
+>
+  ${ans}
+</div>
+
+<div
+  style="
+    height:2px;
+    width:60px;
+    background:rgba(255,255,255,0.35);
+    margin:22px auto 0;
+    border-radius:2px
+  "
+></div>
+
+<div
+  style="
+    font-size:14px;
+    color:#E5D8FF;
+    margin-top:18px;
+    line-height:1.6;
+    font-style:italic
+  "
+>
+  ${esc(quip)}
+</div>
+
+</td>
+
+</tr>
+
+</table>
+
+</td>
+
+</tr>
+
+</table>
+
+<!-- QUANTUM RESULT -->
+
+<table
+  role="presentation"
+  width="100%"
+  cellpadding="0"
+  cellspacing="0"
+>
+
+<tr>
+
+<td
+  style="
+    padding:30px 32px 0;
+    text-align:${align}
+  "
+>
+
+<div
+  style="
+    font-size:12px;
+    font-weight:bold;
+    letter-spacing:1.5px;
+    color:${C.muted};
+    text-transform:uppercase;
+    margin-bottom:14px
+  "
+>
+  ${t.resultLabel}
+</div>
+
+</td>
+
+</tr>
+
+</table>
+
+<table
+  role="presentation"
+  width="100%"
+  cellpadding="0"
+  cellspacing="0"
+  style="padding:0 28px"
+>
+
+<tr>
+
+${statCard(
+  '⚛️',
+  t.stateLabel,
+  `|${s}⟩`,
+  true
+)}
+
+${statCard(
+  '🔮',
+  t.oracleLabel,
+  pers,
+  false
+)}
+
+${statCard(
+  '⚡',
+  t.energyLabel,
+  energy,
+  false
+)}
+
+</tr>
+
+</table>
+
+<!-- PLAIN WORDS -->
+
+<table
+  role="presentation"
+  width="100%"
+  cellpadding="0"
+  cellspacing="0"
+>
+
+<tr>
+
+<td
+  style="padding:24px 32px 0"
+>
+
+<table
+  role="presentation"
+  width="100%"
+  cellpadding="0"
+  cellspacing="0"
+  style="
+    background:${C.lightLavender};
+    border-radius:14px;
+    border:1px dashed ${C.lavender}
+  "
+>
+
+<tr>
+
+<td
+  style="
+    padding:18px 22px;
+    text-align:${align}
+  "
+>
+
+<div
+  style="
+    font-size:11px;
+    font-weight:bold;
+    letter-spacing:1.5px;
+    color:${C.purple};
+    text-transform:uppercase;
+    margin-bottom:8px
+  "
+>
+  ${t.funLabel}
+</div>
+
+<div
+  style="
+    font-size:14px;
+    line-height:1.7;
+    color:${C.text}
+  "
+>
+  ${t.funText(s)}
+</div>
+
+</td>
+
+</tr>
+
+</table>
+
+</td>
+
+</tr>
+
+</table>
+
+<!-- DID YOU KNOW -->
+
+<table
+  role="presentation"
+  width="100%"
+  cellpadding="0"
+  cellspacing="0"
+>
+
+<tr>
+
+<td
+  style="padding:26px 32px 0"
+>
+
+<table
+  role="presentation"
+  width="100%"
+  cellpadding="0"
+  cellspacing="0"
+  style="
+    background:#FEF9EE;
+    border:1px solid #FDE9BF;
+    border-radius:16px
+  "
+>
+
+<tr>
+
+<td
+  style="
+    padding:22px 24px;
+    text-align:${align}
+  "
+>
+
+<div
+  style="
+    font-size:12px;
+    font-weight:bold;
+    letter-spacing:1.5px;
+    color:${C.gold};
+    text-transform:uppercase
+  "
+>
+  ${t.dykLabel}
+</div>
+
+<div
+  style="
+    font-size:18px;
+    font-weight:800;
+    color:${C.darkPurple};
+    margin-top:10px;
+    line-height:1.35
+  "
+>
+  ${esc(fact.t)}
+</div>
+
+<div
+  style="
+    font-size:14px;
+    line-height:1.7;
+    color:${C.text};
+    margin-top:10px
+  "
+>
+  ${esc(fact.f)}
+</div>
+
+<div
+  style="
+    font-size:13px;
+    line-height:1.7;
+    color:${C.blue};
+    margin-top:12px;
+    background:${C.lightBlue};
+    padding:12px 14px;
+    border-radius:10px;
+    border:1px solid #BAE6FD
+  "
+>
+  <b>☁️</b> ${esc(fact.c)}
+</div>
+
+<div
+  style="
+    font-size:14px;
+    font-weight:bold;
+    color:${C.purple};
+    margin-top:14px
+  "
+>
+  ${esc(fact.h)}
+</div>
+
+</td>
+
+</tr>
+
+</table>
+
+</td>
+
+</tr>
+
+</table>
+
+<!-- CLOUD -->
+
+<table
+  role="presentation"
+  width="100%"
+  cellpadding="0"
+  cellspacing="0"
+>
+
+<tr>
+
+<td
+  style="padding:26px 32px 0"
+>
+
+<table
+  role="presentation"
+  width="100%"
+  cellpadding="0"
+  cellspacing="0"
+  style="
+    background:${C.lightBlue};
+    background-image:linear-gradient(
+      135deg,
+      ${C.lightBlue} 0%,
+      #F0F9FF 100%
+    );
+    border-radius:16px;
+    border:1px solid #BAE6FD
+  "
+>
+
+<tr>
+
+<td
+  style="
+    padding:22px 24px;
+    text-align:${align}
+  "
+>
+
+<div
+  style="
+    font-size:12px;
+    font-weight:bold;
+    letter-spacing:1.5px;
+    color:${C.blue};
+    text-transform:uppercase
+  "
+>
+  ${t.cloudLabel}
+</div>
+
+<div
+  style="
+    font-size:17px;
+    font-weight:800;
+    color:${C.blue};
+    margin-top:8px;
+    line-height:1.35
+  "
+>
+  ${theme}
+</div>
+
+<div
+  style="
+    font-size:14px;
+    line-height:1.7;
+    color:#0C4A6E;
+    margin-top:10px
+  "
+>
+  ${t.cloudText}
+</div>
+
+</td>
+
+</tr>
+
+</table>
+
+</td>
+
+</tr>
+
+</table>
+
+<!-- CTA -->
+
+${ctaBlock}
+
+<!-- QISKIT LINK -->
+
+<table
+  role="presentation"
+  width="100%"
+  cellpadding="0"
+  cellspacing="0"
+>
+
+<tr>
+
+<td
+  align="center"
+  style="padding:22px 32px 0"
+>
+
+<a
+  href="https://qiskit.org"
+  style="
+    color:${C.purple};
+    font-size:14px;
+    font-weight:bold;
+    text-decoration:underline
+  "
+>
+  ${t.qiskitLink}
+</a>
+
+</td>
+
+</tr>
+
+</table>
+
+<!-- FOOTER -->
+
+<table
+  role="presentation"
+  width="100%"
+  cellpadding="0"
+  cellspacing="0"
+>
+
+<tr>
+
+<td
+  style="
+    padding:30px 32px 34px;
+    text-align:${align}
+  "
+>
+
+<div
+  style="
+    border-top:1px solid ${C.cardBorder};
+    padding-top:20px
+  "
+>
+
+<div
+  style="
+    font-size:14px;
+    font-weight:800;
+    color:${C.darkPurple};
+    line-height:1.4
+  "
+>
+  ${t.footerOrg}
+</div>
+
+<div
+  style="
+    font-size:13px;
+    color:${C.muted};
+    margin-top:2px
+  "
+>
+  ${t.footerUni}
+</div>
+
+<div
+  style="
+    font-size:12px;
+    color:${C.muted};
+    line-height:1.8;
+    margin-top:14px
+  "
+>
+  <span
+    style="
+      color:${C.purple};
+      font-weight:bold
+    "
+  >
+    ${ev}
+  </span>
+  · ${theme}
+</div>
+
+<div
+  style="
+    font-size:12px;
+    color:${C.muted};
+    margin-top:14px;
+    line-height:1.7
+  "
+>
+  ${t.footerNote}
+</div>
+
+<div
+  style="
+    font-size:13px;
+    font-weight:bold;
+    color:${C.darkPurple};
+    margin-top:16px
+  "
+>
+  ✨ ${t.footerCredit}
+</div>
+
+</div>
+
+</td>
+
+</tr>
+
+</table>
+
+</td>
+
+</tr>
+
+</table>
+
+</td>
+
+</tr>
+
+<tr>
+
+<td
+  align="center"
+  style="
+    padding:18px 12px 0;
+    font-size:11px;
+    color:${C.muted}
+  "
+>
+  &nbsp;
+</td>
+
+</tr>
+
+</table>
+
+</td>
+
+</tr>
+
 </table>
 
 </body>
+
 </html>
 `;
 
   const strip = (h) =>
-    String(h).replace(/<[^>]+>/g, '');
+    String(h).replace(
+      /<[^>]+>/g,
+      ''
+    );
 
   const text = [
-    strip(t.greeting(visitor.name)),
+    strip(
+      t.greeting(visitor.name)
+    ),
+
     '',
+
     t.greetMsg,
+
     '',
+
     `— ${t.qLabel} —`,
+
     `"${session.question}"`,
+
     '',
+
     `— ${t.answerLabel} —`,
+
     session.aiResponse,
+
     `(${quip})`,
+
     '',
+
     `— ${t.resultLabel} —`,
+
     `${t.stateLabel}: |${session.quantumState}⟩`,
+
     `${t.oracleLabel}: ${
       lang === 'ar'
-        ? PERS_AR[session.quantumState]
-        : PERS_EN[session.quantumState]
+        ? PERS_AR[
+            session.quantumState
+          ]
+        : PERS_EN[
+            session.quantumState
+          ]
     }`,
+
     `${t.energyLabel}: ${
       lang === 'ar'
-        ? ENERGY_AR[session.oracleEnergy] ||
+        ? ENERGY_AR[
+            session.oracleEnergy
+          ] ||
           session.oracleEnergy
-        : ENERGY_EN(session.oracleEnergy)
+        : ENERGY_EN(
+            session.oracleEnergy
+          )
     }`,
+
     '',
+
     `— ${t.dykLabel} —`,
+
     fact.t,
+
     fact.f,
+
     `☁️ ${fact.c}`,
+
     fact.h,
+
     '',
+
     `— ${t.cloudLabel} —`,
+
     theme,
+
     t.cloudText,
+
     '',
+
     env.EVENT_QR_URL
       ? `${t.ctaLabel} → ${env.EVENT_QR_URL}`
       : '',
+
     '',
+
     `${t.footerOrg} · ${t.footerUni}`,
+
     `${ev} · ${theme}`,
+
     t.footerNote,
+
     `✨ ${t.footerCredit}`,
   ]
     .filter(
       (l, i, a) =>
-        l !== '' || a[i - 1] !== ''
+        l !== '' ||
+        a[i - 1] !== ''
     )
     .join('\n');
 
@@ -1216,68 +2036,160 @@ export function buildEmail(session, visitor, env = {}) {
       lang === 'ar'
         ? `🔮 ${visitor.name}، العرّاف الكمّي حكى!`
         : `🔮 ${visitor.name}, the Oracle has spoken!`,
+
     html,
+
     text,
-    attachments: LOGO_B64
-      ? [
-          {
-            filename: 'qcc-logo.png',
-            content: LOGO_B64,
-            content_type: 'image/png',
-            content_id: LOGO_CID,
-          },
-        ]
-      : [],
+
+    attachments:
+      LOGO_B64
+        ? [
+            {
+              filename:
+                'qcc-logo.png',
+              content:
+                LOGO_B64,
+              content_type:
+                'image/png',
+              content_id:
+                LOGO_CID,
+            },
+          ]
+        : [],
   };
 }
 
-// ---------- Send Email (unified — no old Arabic path) ----------
-async function sendEmail(session, visitor) {
+// ---------- Send Email using Brevo ----------
+async function sendEmail(
+  session,
+  visitor
+) {
   try {
-    if (!env.EMAIL_API_KEY) {
-      throw new Error('EMAIL_API_KEY not configured');
-    }
-
-    const email = buildEmail(session, visitor, env);
-
-    const r = await fetch(
-      'https://api.resend.com/emails',
-      {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${env.EMAIL_API_KEY}`,
-          'content-type': 'application/json',
-        },
-        body: JSON.stringify({
-          from: env.EMAIL_FROM,
-          to: [visitor.email],
-          subject: email.subject,
-          html: email.html,
-          text: email.text,
-          attachments: email.attachments,
-        }),
-        signal: AbortSignal.timeout(10000),
-      }
-    );
-
-    if (!r.ok) {
+    if (!env.BREVO_API_KEY) {
       throw new Error(
-        `email provider ${r.status}: ${(
-          await r.text()
-        ).slice(0, 200)}`
+        'BREVO_API_KEY not configured'
       );
     }
 
+    if (!env.EMAIL_FROM) {
+      throw new Error(
+        'EMAIL_FROM not configured'
+      );
+    }
+
+    const email =
+      buildEmail(
+        session,
+        visitor,
+        env
+      );
+
+    const senderEmail =
+      String(env.EMAIL_FROM)
+        .replace(/^.*<([^>]+)>.*$/, '$1')
+        .trim();
+
+    const senderName =
+      env.EMAIL_FROM.includes('<')
+        ? env.EMAIL_FROM
+            .split('<')[0]
+            .trim()
+        : 'Quantum Oracle';
+
+    const payload = {
+      sender: {
+        name:
+          senderName ||
+          'Quantum Oracle',
+        email:
+          senderEmail,
+      },
+
+      to: [
+        {
+          email:
+            visitor.email,
+          name:
+            visitor.name,
+        },
+      ],
+
+      subject:
+        email.subject,
+
+      htmlContent:
+        email.html,
+
+      textContent:
+        email.text,
+    };
+
+    const r = await fetch(
+      'https://api.brevo.com/v3/smtp/email',
+      {
+        method: 'POST',
+
+        headers: {
+          accept:
+            'application/json',
+
+          'api-key':
+            env.BREVO_API_KEY,
+
+          'content-type':
+            'application/json',
+        },
+
+        body:
+          JSON.stringify(
+            payload
+          ),
+
+        signal:
+          AbortSignal.timeout(
+            10000
+          ),
+      }
+    );
+
+    const responseText =
+      await r.text();
+
+    if (!r.ok) {
+      throw new Error(
+        `email provider ${r.status}: ${responseText.slice(
+          0,
+          300
+        )}`
+      );
+    }
+
+    console.log(
+      '[email] sent successfully:',
+      responseText
+    );
+
     Object.assign(session, {
       emailSent: true,
-      emailSentAt: new Date().toISOString(),
-      emailError: null,
+
+      emailSentAt:
+        new Date().toISOString(),
+
+      emailError:
+        null,
     });
+
   } catch (e) {
-    console.error('[email]', e.message);
+    console.error(
+      '[email]',
+      e.message
+    );
+
     Object.assign(session, {
       emailSent: false,
-      emailError: e.message,
+
+      emailError:
+        e.message,
     });
   }
 }
@@ -1286,55 +2198,106 @@ async function sendEmail(session, visitor) {
 // ---------- App ----------
 // ============================================================
 
-const app = express();
+const app =
+  express();
 
-app.set('trust proxy', 1);
+app.set(
+  'trust proxy',
+  1
+);
 
-app.use(express.json({ limit: '10kb' }));
-app.use(express.static('public'));
+app.use(
+  express.json({
+    limit: '10kb',
+  })
+);
 
-const hits = new Map();
+app.use(
+  express.static('public')
+);
+
+const hits =
+  new Map();
 
 const limit =
   (max, ms) =>
   (req, res, next) => {
-    const k = req.ip + req.path;
-    const now = Date.now();
-    const arr = (hits.get(k) || []).filter(
-      (t) => now - t < ms
-    );
+    const k =
+      req.ip +
+      req.path;
 
-    if (arr.length >= max) {
-      return res.status(429).json({
-        ok: false,
-        error:
-          'The Oracle needs a moment. Please try again shortly.',
-      });
+    const now =
+      Date.now();
+
+    const arr =
+      (hits.get(k) || [])
+        .filter(
+          (t) =>
+            now - t < ms
+        );
+
+    if (
+      arr.length >= max
+    ) {
+      return res
+        .status(429)
+        .json({
+          ok: false,
+
+          error:
+            'The Oracle needs a moment. Please try again shortly.',
+        });
     }
 
     arr.push(now);
-    hits.set(k, arr);
+
+    hits.set(
+      k,
+      arr
+    );
+
     next();
   };
 
-setInterval(() => hits.clear(), 600000).unref();
+setInterval(
+  () =>
+    hits.clear(),
+  600000
+).unref();
 
-const admin = (req, res, next) =>
-  env.ADMIN_SECRET &&
-  req.get('x-admin-secret') === env.ADMIN_SECRET
-    ? next()
-    : res.status(401).json({
-        error: 'Unauthorized',
-      });
+const admin =
+  (req, res, next) =>
+    env.ADMIN_SECRET &&
+    req.get(
+      'x-admin-secret'
+    ) ===
+      env.ADMIN_SECRET
+      ? next()
+      : res
+          .status(401)
+          .json({
+            error:
+              'Unauthorized',
+          });
 
-const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+const EMAIL_RE =
+  /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 
 // ---------- Consult ----------
 app.post(
   '/api/oracle/consult',
-  limit(30, 60000),
-  async (req, res) => {
-    const t0 = Date.now();
+
+  limit(
+    30,
+    60000
+  ),
+
+  async (
+    req,
+    res
+  ) => {
+    const t0 =
+      Date.now();
 
     try {
       const {
@@ -1344,120 +2307,254 @@ app.post(
         consent,
         marketingConsent,
         demo,
-      } = req.body || {};
+      } =
+        req.body || {};
 
-      const q = String(question || '').trim();
-      const n = String(name || '').trim();
+      const q =
+        String(
+          question || ''
+        ).trim();
 
-      if (n.length < 1 || n.length > 80) {
-        return res.status(400).json({
-          ok: false,
-          error: 'Please enter your name.',
-        });
+      const n =
+        String(
+          name || ''
+        ).trim();
+
+      if (
+        n.length < 1 ||
+        n.length > 80
+      ) {
+        return res
+          .status(400)
+          .json({
+            ok: false,
+
+            error:
+              'Please enter your name.',
+          });
       }
 
       if (
         !demo &&
-        !EMAIL_RE.test(String(email || ''))
+        !EMAIL_RE.test(
+          String(
+            email || ''
+          )
+        )
       ) {
-        return res.status(400).json({
-          ok: false,
-          error: 'Please enter a valid email.',
-        });
+        return res
+          .status(400)
+          .json({
+            ok: false,
+
+            error:
+              'Please enter a valid email.',
+          });
       }
 
-      if (q.length < 3 || q.length > 500) {
-        return res.status(400).json({
-          ok: false,
-          error: 'Questions must be 3–500 characters.',
-        });
+      if (
+        q.length < 3 ||
+        q.length > 500
+      ) {
+        return res
+          .status(400)
+          .json({
+            ok: false,
+
+            error:
+              'Questions must be 3–500 characters.',
+          });
       }
 
-      if (consent !== true) {
-        return res.status(400).json({
-          ok: false,
-          error:
-            'Consent is required to consult the Oracle.',
-        });
+      if (
+        consent !== true
+      ) {
+        return res
+          .status(400)
+          .json({
+            ok: false,
+
+            error:
+              'Consent is required to consult the Oracle.',
+          });
       }
 
-      const modStatus = moderate(q);
+      const modStatus =
+        moderate(q);
 
       let qr;
 
       try {
-        qr = getEngine().generateState();
+        qr =
+          getEngine()
+            .generateState();
+
       } catch (e) {
-        console.error('[quantum]', e.message);
-        qr = new SimulatedQuantumEngine().generateState();
+        console.error(
+          '[quantum]',
+          e.message
+        );
+
+        qr =
+          new SimulatedQuantumEngine()
+            .generateState();
       }
 
-      const p = PERSONALITIES[qr.state];
-      const energy = energyFor(
-        qr.state,
-        crypto.randomInt(5)
-      );
+      const p =
+        PERSONALITIES[
+          qr.state
+        ];
 
-      const { text, fallback } = await askAI(
-        q,
-        p,
-        energy,
-        qr.state
-      );
+      const energy =
+        energyFor(
+          qr.state,
+          crypto.randomInt(5)
+        );
 
-      const first = text
-        .split(/(?<=[.!?؟])\s/)[0]
-        .slice(0, 140);
+      const {
+        text,
+        fallback,
+      } =
+        await askAI(
+          q,
+          p,
+          energy,
+          qr.state
+        );
+
+      const first =
+        text
+          .split(
+            /(?<=[.!?؟])\s/
+          )[0]
+          .slice(
+            0,
+            140
+          );
 
       const session = {
-        id: crypto.randomUUID(),
-        visitorId: null,
-        question: q,
-        aiResponse: text,
-        aiFallback: fallback,
-        quantumState: qr.state,
-        circuit: qr.circuit,
-        quantumMode: qr.mode,
-        oracleEnergy: energy,
-        topic: classify(q),
-        moderation: modStatus,
-        hidden: modStatus !== 'approved',
-        demo: !!demo,
-        publicQuestion: q.slice(0, 140),
-        publicResponse: first,
-        emailSent: false,
-        emailSentAt: null,
-        emailError: null,
-        createdAt: new Date().toISOString(),
+        id:
+          crypto.randomUUID(),
+
+        visitorId:
+          null,
+
+        question:
+          q,
+
+        aiResponse:
+          text,
+
+        aiFallback:
+          fallback,
+
+        quantumState:
+          qr.state,
+
+        circuit:
+          qr.circuit,
+
+        quantumMode:
+          qr.mode,
+
+        oracleEnergy:
+          energy,
+
+        topic:
+          classify(q),
+
+        moderation:
+          modStatus,
+
+        hidden:
+          modStatus !==
+          'approved',
+
+        demo:
+          !!demo,
+
+        publicQuestion:
+          q.slice(
+            0,
+            140
+          ),
+
+        publicResponse:
+          first,
+
+        emailSent:
+          false,
+
+        emailSentAt:
+          null,
+
+        emailError:
+          null,
+
+        createdAt:
+          new Date().toISOString(),
       };
 
       if (!demo) {
         const visitor = {
-          id: crypto.randomUUID(),
-          name: n,
-          email: String(email).toLowerCase(),
-          consent: true,
+          id:
+            crypto.randomUUID(),
+
+          name:
+            n,
+
+          email:
+            String(
+              email
+            ).toLowerCase(),
+
+          consent:
+            true,
+
           futureMarketingConsent:
-            marketingConsent === true,
-          createdAt: session.createdAt,
+            marketingConsent ===
+            true,
+
+          createdAt:
+            session.createdAt,
         };
 
-        session.visitorId = visitor.id;
+        session.visitorId =
+          visitor.id;
 
-        db.visitors.push(visitor);
-        db.sessions.push(session);
+        db.visitors.push(
+          visitor
+        );
 
-        await sendEmail(session, visitor);
+        db.sessions.push(
+          session
+        );
 
-        session.processingTime = Date.now() - t0;
+        await sendEmail(
+          session,
+          visitor
+        );
+
+        session.processingTime =
+          Date.now() -
+          t0;
+
         save();
+
       } else {
         session.emailError =
           'Demo mode: email disabled';
-        session.processingTime = Date.now() - t0;
 
-        if (!req.body.noPublic) {
-          db.sessions.push(session);
+        session.processingTime =
+          Date.now() -
+          t0;
+
+        if (
+          !req.body.noPublic
+        ) {
+          db.sessions.push(
+            session
+          );
         }
 
         save();
@@ -1465,239 +2562,507 @@ app.post(
 
       res.json({
         ok: true,
-        id: session.id,
-        state: qr.state,
-        quantumState: qr.state,
-        answer: text,
-        circuit: qr.circuit,
-        mode: qr.mode,
-        personality: p.name,
+
+        id:
+          session.id,
+
+        state:
+          qr.state,
+
+        quantumState:
+          qr.state,
+
+        answer:
+          text,
+
+        circuit:
+          qr.circuit,
+
+        mode:
+          qr.mode,
+
+        personality:
+          p.name,
+
         energy,
-        topic: session.topic,
-        teaser: 'Your answer is ready.',
-        emailSent: session.emailSent,
+
+        topic:
+          session.topic,
+
+        teaser:
+          'Your answer is ready.',
+
+        emailSent:
+          session.emailSent,
+
         emailError:
-          session.emailSent || demo
+          session.emailSent ||
+          demo
             ? null
             : 'The Oracle prepared your answer, but the message could not reach your inbox.',
-        aiFallback: fallback,
-        demo: !!demo,
+
+        aiFallback:
+          fallback,
+
+        demo:
+          !!demo,
       });
+
     } catch (e) {
-      console.error('[consult]', e);
-      res.status(500).json({
-        ok: false,
-        error:
-          'THE ORACLE LOST CONNECTION TO THE CLOUD. Please try again.',
-      });
+      console.error(
+        '[consult]',
+        e
+      );
+
+      res
+        .status(500)
+        .json({
+          ok: false,
+
+          error:
+            'THE ORACLE LOST CONNECTION TO THE CLOUD. Please try again.',
+        });
     }
   }
 );
 
 // ---------- Stats ----------
 const real = () =>
-  db.sessions.filter((s) => !s.demo);
+  db.sessions.filter(
+    (s) => !s.demo
+  );
 
-const tally = (arr, k) =>
-  arr.reduce((a, s) => {
-    a[s[k]] = (a[s[k]] || 0) + 1;
-    return a;
-  }, {});
+const tally =
+  (arr, k) =>
+  arr.reduce(
+    (a, s) => {
+      a[s[k]] =
+        (a[s[k]] || 0) +
+        1;
 
-const top = (o) =>
-  Object.entries(o).sort(
-    (a, b) => b[1] - a[1]
-  )[0]?.[0] || null;
+      return a;
+    },
+    {}
+  );
+
+const top =
+  (o) =>
+    Object.entries(o)
+      .sort(
+        (a, b) =>
+          b[1] - a[1]
+      )[0]?.[0] ||
+    null;
 
 function stats() {
-  const r = real();
-  const today = new Date().toDateString();
-  const topics = tally(r, 'topic');
-  const pers = tally(r, 'quantumState');
-  const en = tally(r, 'oracleEnergy');
+  const r =
+    real();
+
+  const today =
+    new Date()
+      .toDateString();
+
+  const topics =
+    tally(
+      r,
+      'topic'
+    );
+
+  const pers =
+    tally(
+      r,
+      'quantumState'
+    );
+
+  const en =
+    tally(
+      r,
+      'oracleEnergy'
+    );
 
   return {
-    questions: r.length,
-    totalConsultations: r.length,
-    today: r.filter(
-      (s) =>
-        new Date(s.createdAt).toDateString() ===
-        today
-    ).length,
+    questions:
+      r.length,
+
+    totalConsultations:
+      r.length,
+
+    today:
+      r.filter(
+        (s) =>
+          new Date(
+            s.createdAt
+          ).toDateString() ===
+          today
+      ).length,
+
     topics,
-    topTopic: top(topics),
+
+    topTopic:
+      top(topics),
+
     topPersonality:
-      pers && top(pers)
-        ? PERSONALITIES[top(pers)].name
+      pers &&
+      top(pers)
+        ? PERSONALITIES[
+            top(pers)
+          ].name
         : null,
-    topEnergy: top(en),
-    personalities: pers,
-    energies: en,
-    avgMs: r.length
-      ? Math.round(
-          r.reduce(
-            (a, s) =>
-              a + (s.processingTime || 0),
-            0
-          ) / r.length
-        )
-      : 0,
+
+    topEnergy:
+      top(en),
+
+    personalities:
+      pers,
+
+    energies:
+      en,
+
+    avgMs:
+      r.length
+        ? Math.round(
+            r.reduce(
+              (a, s) =>
+                a +
+                (s.processingTime ||
+                  0),
+              0
+            ) /
+              r.length
+          )
+        : 0,
   };
 }
 
-app.get('/api/oracle/stats', (_q, res) =>
-  res.json(stats())
+app.get(
+  '/api/oracle/stats',
+  (_q, res) =>
+    res.json(
+      stats()
+    )
 );
 
 // ---------- Public ----------
-app.get('/api/oracle/public', (_q, res) => {
-  const visible = real().filter(
-    (s) => !s.hidden
-  );
+app.get(
+  '/api/oracle/public',
+  (_q, res) => {
+    const visible =
+      real().filter(
+        (s) =>
+          !s.hidden
+      );
 
-  const last = visible[visible.length - 1];
+    const last =
+      visible[
+        visible.length -
+          1
+      ];
 
-  res.json({
-    stats: stats(),
-    display: last
-      ? {
-          createdAt: last.createdAt,
-          state: last.quantumState,
-          question: last.publicQuestion,
-          answer: last.publicResponse,
-        }
-      : null,
-    stars: visible.slice(-150).map((s) => ({
-      id: s.id,
-      question: s.publicQuestion,
-      response: s.publicResponse,
-      topic: s.topic,
-      personality:
-        PERSONALITIES[s.quantumState].name,
-      state: s.quantumState,
-      at: s.createdAt,
-    })),
-    qrUrl: env.EVENT_QR_URL || null,
-  });
-});
+    res.json({
+      stats:
+        stats(),
+
+      display:
+        last
+          ? {
+              createdAt:
+                last.createdAt,
+
+              state:
+                last.quantumState,
+
+              question:
+                last.publicQuestion,
+
+              answer:
+                last.publicResponse,
+            }
+          : null,
+
+      stars:
+        visible
+          .slice(-150)
+          .map(
+            (s) => ({
+              id:
+                s.id,
+
+              question:
+                s.publicQuestion,
+
+              response:
+                s.publicResponse,
+
+              topic:
+                s.topic,
+
+              personality:
+                PERSONALITIES[
+                  s.quantumState
+                ].name,
+
+              state:
+                s.quantumState,
+
+              at:
+                s.createdAt,
+            })
+          ),
+
+      qrUrl:
+        env.EVENT_QR_URL ||
+        null,
+    });
+  }
+);
 
 // ---------- Admin ----------
-app.get('/api/admin/stats', admin, (_q, res) => {
-  const r = real();
+app.get(
+  '/api/admin/stats',
+  admin,
+  (_q, res) => {
+    const r =
+      real();
 
-  res.json({
-    ...stats(),
-    visitors: db.visitors.length,
-    emailsSent: r.filter((s) => s.emailSent).length,
-    emailFailures: r.filter((s) => !s.emailSent)
-      .length,
-    marketingConsent: db.visitors.filter(
-      (v) => v.futureMarketingConsent
-    ).length,
-    health: {
-      ai:
-        env.GEMINI_API_KEY || env.AI_API_KEY
-          ? 'ONLINE'
-          : 'FALLBACK',
-      database: 'ONLINE',
-      email: env.EMAIL_API_KEY
-        ? 'ONLINE'
-        : 'NOT CONFIGURED',
-      quantum: `ONLINE (${
-        env.QUANTUM_MODE || 'simulated'
-      })`,
-    },
-    recent: db.sessions
-      .slice(-40)
-      .reverse()
-      .map((s) => ({
-        id: s.id,
-        at: s.createdAt,
-        question: s.publicQuestion,
-        topic: s.topic,
-        personality:
-          PERSONALITIES[s.quantumState].name,
-        state: s.quantumState,
-        emailSent: s.emailSent,
-        emailError: s.emailError,
-        hidden: s.hidden,
-        demo: s.demo,
-        aiFallback: s.aiFallback,
-      })),
-  });
-});
+    res.json({
+      ...stats(),
 
-app.post('/api/admin/moderate', admin, (req, res) => {
-  const s = db.sessions.find(
-    (x) => x.id === req.body?.id
-  );
+      visitors:
+        db.visitors
+          .length,
 
-  if (!s) {
-    return res.status(404).json({
-      error: 'Not found',
+      emailsSent:
+        r.filter(
+          (s) =>
+            s.emailSent
+        ).length,
+
+      emailFailures:
+        r.filter(
+          (s) =>
+            !s.emailSent
+        ).length,
+
+      marketingConsent:
+        db.visitors.filter(
+          (v) =>
+            v.futureMarketingConsent
+        ).length,
+
+      health: {
+        ai:
+          env.GEMINI_API_KEY ||
+          env.AI_API_KEY
+            ? 'ONLINE'
+            : 'FALLBACK',
+
+        database:
+          'ONLINE',
+
+        email:
+          env.BREVO_API_KEY
+            ? 'ONLINE'
+            : 'NOT CONFIGURED',
+
+        quantum:
+          `ONLINE (${
+            env.QUANTUM_MODE ||
+            'simulated'
+          })`,
+      },
+
+      recent:
+        db.sessions
+          .slice(-40)
+          .reverse()
+          .map(
+            (s) => ({
+              id:
+                s.id,
+
+              at:
+                s.createdAt,
+
+              question:
+                s.publicQuestion,
+
+              topic:
+                s.topic,
+
+              personality:
+                PERSONALITIES[
+                  s.quantumState
+                ].name,
+
+              state:
+                s.quantumState,
+
+              emailSent:
+                s.emailSent,
+
+              emailError:
+                s.emailError,
+
+              hidden:
+                s.hidden,
+
+              demo:
+                s.demo,
+
+              aiFallback:
+                s.aiFallback,
+            })
+          ),
     });
   }
+);
 
-  s.hidden = req.body.action === 'hide';
-  save();
+app.post(
+  '/api/admin/moderate',
+  admin,
+  (req, res) => {
+    const s =
+      db.sessions.find(
+        (x) =>
+          x.id ===
+          req.body?.id
+      );
 
-  res.json({ ok: true });
-});
+    if (!s) {
+      return res
+        .status(404)
+        .json({
+          error:
+            'Not found',
+        });
+    }
 
-app.post('/api/admin/reset-display', admin, (_q, res) => {
-  db.sessions.forEach((s) => (s.hidden = true));
-  save();
-  res.json({ ok: true });
-});
+    s.hidden =
+      req.body.action ===
+      'hide';
 
-// ---------- Email Retry ----------
-const retry = async (req, res) => {
-  const s = db.sessions.find(
-    (x) => x.id === req.body?.id
-  );
+    save();
 
-  const v =
-    s &&
-    db.visitors.find(
-      (x) => x.id === s.visitorId
+    res.json({
+      ok: true,
+    });
+  }
+);
+
+app.post(
+  '/api/admin/reset-display',
+  admin,
+  (_q, res) => {
+    db.sessions.forEach(
+      (s) =>
+        (s.hidden = true)
     );
 
-  if (!s || !v) {
-    return res.status(404).json({
-      error: 'Not found',
+    save();
+
+    res.json({
+      ok: true,
     });
   }
+);
 
-  await sendEmail(s, v);
-  save();
+// ---------- Email Retry ----------
+const retry =
+  async (
+    req,
+    res
+  ) => {
+    const s =
+      db.sessions.find(
+        (x) =>
+          x.id ===
+          req.body?.id
+      );
 
-  res.json({
-    emailSent: s.emailSent,
-    emailError: s.emailError,
-  });
-};
+    const v =
+      s &&
+      db.visitors.find(
+        (x) =>
+          x.id ===
+          s.visitorId
+      );
 
-app.post('/api/admin/email/retry', admin, retry);
+    if (!s || !v) {
+      return res
+        .status(404)
+        .json({
+          error:
+            'Not found',
+        });
+    }
+
+    await sendEmail(
+      s,
+      v
+    );
+
+    save();
+
+    res.json({
+      emailSent:
+        s.emailSent,
+
+      emailError:
+        s.emailError,
+    });
+  };
+
+app.post(
+  '/api/admin/email/retry',
+  admin,
+  retry
+);
 
 // ---------- Error handling ----------
-app.use((err, _q, res, _n) => {
-  console.error(err);
-  res.status(500).json({
-    ok: false,
-    error:
-      'THE ORACLE LOST CONNECTION TO THE CLOUD.',
-  });
-});
+app.use(
+  (
+    err,
+    _q,
+    res,
+    _n
+  ) => {
+    console.error(
+      err
+    );
 
-process.on('unhandledRejection', (e) =>
-  console.error('[unhandledRejection]', e)
+    res
+      .status(500)
+      .json({
+        ok: false,
+
+        error:
+          'THE ORACLE LOST CONNECTION TO THE CLOUD.',
+      });
+  }
+);
+
+process.on(
+  'unhandledRejection',
+  (e) =>
+    console.error(
+      '[unhandledRejection]',
+      e
+    )
 );
 
 // ---------- Start ----------
-if (process.argv[1]?.endsWith('server.js')) {
-  app.listen(env.PORT || 3000, () =>
-    console.log(
-      `Quantum Oracle on :${env.PORT || 3000}`
-    )
+if (
+  process.argv[1]?.endsWith(
+    'server.js'
+  )
+) {
+  app.listen(
+    env.PORT || 3000,
+    () =>
+      console.log(
+        `Quantum Oracle on :${
+          env.PORT || 3000
+        }`
+      )
   );
 }
