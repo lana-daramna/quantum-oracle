@@ -1,3 +1,4 @@
+
 import express from 'express';
 import fs from 'fs';
 import crypto from 'crypto';
@@ -2047,10 +2048,13 @@ ${ctaBlock}
             {
               filename:
                 'qcc-logo.png',
+
               content:
                 LOGO_B64,
+
               content_type:
                 'image/png',
+
               content_id:
                 LOGO_CID,
             },
@@ -2059,7 +2063,10 @@ ${ctaBlock}
   };
 }
 
+// ============================================================
 // ---------- Send Email using Brevo ----------
+// ============================================================
+
 async function sendEmail(
   session,
   visitor
@@ -2084,23 +2091,37 @@ async function sendEmail(
         env
       );
 
-    const senderEmail =
-      String(env.EMAIL_FROM)
-        .replace(/^.*<([^>]+)>.*$/, '$1')
-        .trim();
+    // Supports:
+    // Quantum Oracle <email@gmail.com>
+    // OR
+    // email@gmail.com
+    let senderEmail =
+      String(
+        env.EMAIL_FROM
+      ).trim();
 
-    const senderName =
-      env.EMAIL_FROM.includes('<')
-        ? env.EMAIL_FROM
-            .split('<')[0]
-            .trim()
-        : 'Quantum Oracle';
+    let senderName =
+      'Quantum Oracle';
+
+    const senderMatch =
+      senderEmail.match(
+        /^(.+?)\s*<([^>]+)>$/
+      );
+
+    if (senderMatch) {
+      senderName =
+        senderMatch[1].trim();
+
+      senderEmail =
+        senderMatch[2].trim();
+    }
 
     const payload = {
       sender: {
         name:
           senderName ||
           'Quantum Oracle',
+
         email:
           senderEmail,
       },
@@ -2108,9 +2129,14 @@ async function sendEmail(
       to: [
         {
           email:
-            visitor.email,
+            String(
+              visitor.email
+            ).trim(),
+
           name:
-            visitor.name,
+            String(
+              visitor.name || ''
+            ).trim(),
         },
       ],
 
@@ -2124,73 +2150,130 @@ async function sendEmail(
         email.text,
     };
 
-    const r = await fetch(
-      'https://api.brevo.com/v3/smtp/email',
-      {
-        method: 'POST',
+    // Brevo attachment format
+    if (
+      email.attachments &&
+      email.attachments.length
+    ) {
+      payload.attachment =
+        email.attachments.map(
+          (attachment) => ({
+            name:
+              attachment.filename,
 
-        headers: {
-          accept:
-            'application/json',
+            content:
+              attachment.content,
+          })
+        );
+    }
 
-          'api-key':
-            env.BREVO_API_KEY,
-
-          'content-type':
-            'application/json',
-        },
-
-        body:
-          JSON.stringify(
-            payload
-          ),
-
-        signal:
-          AbortSignal.timeout(
-            10000
-          ),
-      }
+    console.log(
+      '[email] sending through Brevo to:',
+      visitor.email
     );
+
+    const r =
+      await fetch(
+        'https://api.brevo.com/v3/smtp/email',
+        {
+          method: 'POST',
+
+          headers: {
+            accept:
+              'application/json',
+
+            'api-key':
+              env.BREVO_API_KEY,
+
+            'content-type':
+              'application/json',
+          },
+
+          body:
+            JSON.stringify(
+              payload
+            ),
+
+          signal:
+            AbortSignal.timeout(
+              15000
+            ),
+        }
+      );
 
     const responseText =
       await r.text();
 
+    let responseJson =
+      {};
+
+    try {
+      responseJson =
+        JSON.parse(
+          responseText
+        );
+    } catch {
+      responseJson = {};
+    }
+
     if (!r.ok) {
+      console.error(
+        '[email] Brevo error:',
+        r.status,
+        responseText
+      );
+
       throw new Error(
-        `email provider ${r.status}: ${responseText.slice(
-          0,
-          300
-        )}`
+        `Brevo ${r.status}: ${
+          responseJson?.message ||
+          responseText.slice(
+            0,
+            300
+          ) ||
+          'email failed'
+        }`
       );
     }
 
     console.log(
-      '[email] sent successfully:',
-      responseText
+      '[email] Brevo sent successfully:',
+      responseJson
     );
 
-    Object.assign(session, {
-      emailSent: true,
+    Object.assign(
+      session,
+      {
+        emailSent:
+          true,
 
-      emailSentAt:
-        new Date().toISOString(),
+        emailSentAt:
+          new Date().toISOString(),
 
-      emailError:
-        null,
-    });
+        emailError:
+          null,
+      }
+    );
+
+    return true;
 
   } catch (e) {
     console.error(
-      '[email]',
+      '[email] failed:',
       e.message
     );
 
-    Object.assign(session, {
-      emailSent: false,
+    Object.assign(
+      session,
+      {
+        emailSent:
+          false,
 
-      emailError:
-        e.message,
-    });
+        emailError:
+          e.message,
+      }
+    );
+
+    return false;
   }
 }
 
