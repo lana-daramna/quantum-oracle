@@ -1,0 +1,182 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Quantum Oracle | Qiskit Fall Fest 2026</title>
+<link rel="icon" href="/qcc-logo.png">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;800&family=Cormorant+Garamond:wght@600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#06031a;--v:#8b5cf6;--n:#c084fc;--c:#67e8f9;--t:#f5efff;--m:#a595cf}
+*{box-sizing:border-box}html,body{margin:0;min-height:100%}
+body{background:radial-gradient(ellipse at 50% 35%,#30126e 0,var(--bg) 70%);color:var(--t);font-family:Cairo,system-ui,sans-serif;overflow-x:hidden}
+canvas#sky{position:fixed;inset:0;z-index:0}
+main{position:relative;z-index:1;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:130px 20px 90px;text-align:center}
+h1,h2{font-family:'Cormorant Garamond',Cairo,serif;margin:.15em 0}
+[dir=rtl] h1,[dir=rtl] h2{font-family:Cairo,sans-serif;font-weight:800}
+h1{font-size:clamp(2.8rem,8vw,6.5rem);letter-spacing:.05em;background:linear-gradient(180deg,#fff,var(--n));background-clip:text;-webkit-background-clip:text;color:transparent}
+[dir=rtl] h1{letter-spacing:0}
+h2{font-size:clamp(1.7rem,4vw,2.8rem)}
+.sub{color:var(--m);max-width:34rem;line-height:1.7}
+.glass{background:rgba(30,15,70,.6);backdrop-filter:blur(14px);border:1px solid rgba(192,132,252,.3);border-radius:22px;padding:26px;width:min(560px,100%);text-align:start}
+input,textarea{width:100%;background:rgba(6,3,26,.75);border:1px solid rgba(192,132,252,.4);border-radius:12px;color:var(--t);padding:13px;font:inherit;font-size:1.05rem;margin:6px 0 12px}
+textarea{min-height:120px;resize:vertical}
+:focus-visible{outline:3px solid var(--c);outline-offset:2px}
+button{font:700 1rem Cairo;color:#fff;background:linear-gradient(135deg,var(--v),#d946ef);border:0;border-radius:999px;padding:14px 34px;cursor:pointer;box-shadow:0 0 30px rgba(139,92,246,.6);margin-top:12px}
+button.ghost{background:transparent;border:1px solid var(--n);box-shadow:none;padding:6px 14px;font-size:.8rem;margin:3px}
+label.chk{display:flex;gap:10px;font-size:.88rem;color:var(--m);margin:8px 0;align-items:flex-start}
+label.chk input{width:20px;margin:3px 0}
+.err{color:#ff8fb1;min-height:1.3em}
+.top{position:fixed;top:12px;left:16px;right:16px;z-index:3;display:flex;justify-content:space-between;align-items:center;direction:ltr}
+
+.brand{display:flex;align-items:center;gap:14px}
+.brand img{height:clamp(64px,10vw,104px);filter:drop-shadow(0 0 18px rgba(192,132,252,.7))}
+.brand b{display:block;font:800 clamp(.95rem,2.2vw,1.55rem)/1.1 Cairo,sans-serif;letter-spacing:.16em;background:linear-gradient(90deg,#fff,#c084fc 60%,#67e8f9);background-clip:text;-webkit-background-clip:text;color:transparent}
+.brand span{display:block;font-size:.72rem;letter-spacing:.3em;color:var(--m);margin-top:4px}
+.ctl{display:flex;gap:8px}
+.event{direction:ltr;margin-bottom:6px}
+.event .uni{letter-spacing:.38em;font-size:.85rem;color:var(--m)}
+.event .fest{font:700 clamp(1.3rem,3.4vw,2.2rem)/1.2 'Cormorant Garamond',serif;letter-spacing:.14em;color:var(--c);text-shadow:0 0 22px rgba(103,232,249,.6)}
+.event .theme{font-style:italic;color:var(--n);letter-spacing:.08em}
+.gem{width:min(300px,62vw);height:auto;overflow:visible;animation:float 6s ease-in-out infinite;filter:drop-shadow(0 0 38px rgba(139,92,246,.75));transition:filter 1s}
+.gem.big{width:min(430px,75vw)}
+.gem[data-s="00"]{--hue:0deg}.gem[data-s="01"]{--hue:-40deg}.gem[data-s="10"]{--hue:45deg}.gem[data-s="11"]{--hue:-80deg}
+.gem[data-s]{filter:hue-rotate(var(--hue)) drop-shadow(0 0 45px rgba(139,92,246,.8))}
+.gem.pulse{animation:float 6s ease-in-out infinite,pulse 1s}
+.gem .shine{animation:shine 4.5s ease-in-out infinite}
+.gem .ring{fill:none;stroke:rgba(192,132,252,.55);stroke-width:1.5}
+.gem .tw{animation:tw 2.4s ease-in-out infinite}.gem .tw:nth-child(2n){animation-delay:.9s}.gem .tw:nth-child(3n){animation-delay:1.6s}
+@keyframes float{50%{transform:translateY(-16px)}}
+@keyframes pulse{40%{filter:drop-shadow(0 0 110px #67e8f9) brightness(1.6)}}
+@keyframes shine{0%,35%{transform:translateX(-160px)}70%,100%{transform:translateX(330px)}}
+@keyframes tw{50%{opacity:.1}}
+.journey{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;margin:12px 0}
+.node{padding:7px 12px;border-radius:999px;border:1px solid #4b3a86;color:#6b5aa5;font-size:.8rem;transition:.4s}
+.node.done{color:var(--t);border-color:var(--n)}.node.on{color:#fff;border-color:var(--c);box-shadow:0 0 22px var(--c);background:rgba(103,232,249,.15)}
+.stage{font-size:clamp(1.5rem,4vw,2.4rem);font-weight:700;min-height:1.4em}
+.mono{font-family:ui-monospace,monospace;color:var(--c);direction:ltr;unicode-bidi:isolate}
+.answer{font-size:clamp(1.7rem,4.5vw,3rem);font-weight:800;line-height:1.5;max-width:40rem;color:#f0e4ff;text-shadow:0 0 28px rgba(192,132,252,.7);min-height:3em}
+.chips{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin:8px 0}
+.chip{border:1px solid var(--n);border-radius:999px;padding:5px 16px;font-size:.9rem;background:rgba(139,92,246,.18)}
+footer{position:fixed;bottom:0;inset-inline:0;z-index:2;text-align:center;font-size:.7rem;color:var(--m);padding:8px;background:linear-gradient(transparent,var(--bg))}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style></head><body>
+<canvas id="sky" aria-hidden="true"></canvas>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+<linearGradient id="fTL" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f5e9ff"/><stop offset="1" stop-color="#b98cff"/></linearGradient>
+<linearGradient id="fTR" x1="1" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#d9b8ff"/><stop offset="1" stop-color="#7c3aed"/></linearGradient>
+<linearGradient id="fL" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#a97bff"/><stop offset=".6" stop-color="#6d28d9"/><stop offset="1" stop-color="#3b0f8c"/></linearGradient>
+<linearGradient id="fR" x1="1" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#8b5cf6"/><stop offset=".55" stop-color="#4c1d95"/><stop offset="1" stop-color="#22d3ee"/></linearGradient>
+<linearGradient id="fBL" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#5b21b6"/><stop offset="1" stop-color="#1e0a4d"/></linearGradient>
+<linearGradient id="fBR" x1="1" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3b1480"/><stop offset="1" stop-color="#67e8f9"/></linearGradient>
+<radialGradient id="core"><stop offset="0" stop-color="#fff" stop-opacity=".95"/><stop offset=".35" stop-color="#e9d5ff" stop-opacity=".5"/><stop offset="1" stop-color="#8b5cf6" stop-opacity="0"/></radialGradient>
+<clipPath id="gemClip"><polygon points="200,20 130,120 140,380 200,470 260,380 270,120"/></clipPath>
+<g id="gemShape" stroke="rgba(255,255,255,.55)" stroke-width="1.6" stroke-linejoin="round">
+<polygon points="200,20 130,120 200,140" fill="url(#fTL)"/><polygon points="200,20 200,140 270,120" fill="url(#fTR)"/>
+<polygon points="130,120 200,140 200,400 140,380" fill="url(#fL)"/><polygon points="200,140 270,120 260,380 200,400" fill="url(#fR)"/>
+<polygon points="140,380 200,400 200,470" fill="url(#fBL)"/><polygon points="200,400 260,380 200,470" fill="url(#fBR)"/>
+<polygon points="170,150 200,160 196,300 176,290" fill="rgba(255,255,255,.22)" stroke="none"/></g>
+</defs></svg>
+<div class="top"><div class="brand"><img src="/qcc-mark.png" alt="BZU Quantum Computing Club logo"><div><b>QUANTUM COMPUTING CLUB</b><span>BIRZEIT UNIVERSITY</span></div></div><div class="ctl"><button class="ghost" id="snd" aria-label="Sound">🔊</button><button class="ghost" id="lang">English</button></div></div>
+<main id="app"></main>
+<footer dir="ltr">BIRZEIT UNIVERSITY · QISKIT FALL FEST 2026 · QUANTUM COMPUTING CLUB · A Decade on the Cloud · Game Developer — Lana Daramna</footer>
+<script>
+const $=(s,r=document)=>r.querySelector(s),app=$('#app');
+const view=new URLSearchParams(location.search).get('view');
+let lang=localStorage.getItem('lang')||((navigator.language||'').startsWith('ar')?'ar':'en');
+const T={
+en:{enter:'ENTER THE ORACLE',tag:'Ask the question. Enter the quantum.',sub:'Ask a question. The quantum state decides the answer.',note:'Quantum-inspired simulation · Cloud-connected · For fun and learning',title:'QUANTUM ORACLE',
+id:'IDENTIFY YOURSELF',name:'Your name',email:'Your email',next:'CONTINUE',seek:'WHAT DO YOU SEEK?',ph:'Ask the Oracle anything... or choose between two things',
+c1:'I agree that my name, email, question and the Oracle’s answer may be stored for this event.',c2:'I would like to receive future Quantum Computing Club event updates.',act:'ACTIVATE THE ORACLE',
+eName:'Enter your name.',eMail:'Enter a valid email address.',eQ:'Ask a question of at least 3 characters.',eC:'Please agree to the storage of your session.',
+ex:['Should I learn quantum computing?','Frontend or backend?','Should I join the Quantum Computing Club?','Pizza or burger?'],
+st:['QUESTION SEALED','CONNECTING TO THE CLOUD','QUANTUM STATE INITIALIZING','MEASURING...','THE ORACLE IS LISTENING...'],
+jn:['Question','☁ Cloud','⚛ Quantum','🔮 Oracle'],spoke:'THE ORACLE HAS SPOKEN',state:'Quantum state',sent:'Your answer was sealed. Check your inbox.',notSent:'The Oracle’s answer is above, but the email could not reach your inbox.',
+thanks:'Thank you for consulting the Oracle.',again:'NEXT VISITOR',retry:'Try again',lost:'THE ORACLE LOST CONNECTION TO THE CLOUD',rem:'THE ORACLE REMEMBERS',asked:'questions answered',latest:'The latest anonymous question',
+other:'العربية'},
+ar:{enter:'ادخل إلى العرّاف',tag:'اسأل السؤال. ادخل إلى عالم الكوانتم.',sub:'اسأل سؤالك، والحالة الكمّية بتحدد الجواب.',note:'محاكاة مستوحاة من الكوانتم · متصلة بالسحابة · للمتعة والتعلّم',title:'العرّاف الكمّي',
+id:'عرّفنا عن نفسك',name:'اسمك',email:'بريدك الإلكتروني',next:'متابعة',seek:'شو بدك تعرف؟',ph:'اسأل العرّاف أي شي... أو اختار بين خيارين',
+c1:'أوافق على حفظ اسمي وبريدي وسؤالي وجواب العرّاف لهذه الفعالية.',c2:'أرغب باستقبال أخبار فعاليات نادي الحوسبة الكمّية.',act:'فعّل العرّاف',
+eName:'اكتب اسمك.',eMail:'اكتب بريد إلكتروني صحيح.',eQ:'اكتب سؤال من 3 أحرف على الأقل.',eC:'لازم توافق على حفظ جلستك.',
+ex:['أتعلم الحوسبة الكمّية؟','أختار frontend ولا backend؟','أنضم لنادي الحوسبة الكمّية؟','بيتزا ولا برغر؟'],
+st:['تم ختم سؤالك','جاري الاتصال بالسحابة','تهيئة الحالة الكمّية','جاري القياس...','العرّاف يُصغي...'],
+jn:['السؤال','☁ السحابة','⚛ الكوانتم','🔮 العرّاف'],spoke:'العرّاف قال كلمته',state:'الحالة الكمّية',sent:'تم ختم إجابتك. تفقّد بريدك.',notSent:'جواب العرّاف فوق، بس الرسالة ما وصلت لبريدك.',
+thanks:'شكراً لأنك استشرت العرّاف.',again:'الزائر التالي',retry:'حاول مرة ثانية',lost:'العرّاف فقد الاتصال بالسحابة',rem:'العرّاف يتذكّر',asked:'سؤال تمت الإجابة عنه',latest:'آخر سؤال (مجهول الهوية)',
+other:'English'}};
+const PN={'00':'الحكيم','01':'المتفائل','10':'المتحدّي','11':'المتشكّك'},EN={COSMIC:'كونية',ELECTRIC:'كهربائية',MYSTERIOUS:'غامضة',CHAOTIC:'فوضوية',SERENE:'هادئة'};
+const t=()=>T[lang],isAr=s=>/[\u0600-\u06FF]/.test(s||''),esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+/* ---- sound engine (starts on first user gesture; toggle top-right) ---- */
+let ac,master,soundOn=localStorage.getItem('snd')!=='0';
+function initAudio(){if(ac){if(ac.state==='suspended')ac.resume();return}
+ ac=new (window.AudioContext||window.webkitAudioContext)();master=ac.createGain();master.gain.value=soundOn?1:0;master.connect(ac.destination);
+ const lp=ac.createBiquadFilter();lp.type='lowpass';lp.frequency.value=700;lp.connect(master);
+ [55,82.4,110,164.8].forEach((f,i)=>{const o=ac.createOscillator(),g=ac.createGain(),l=ac.createOscillator(),lg=ac.createGain();o.type=i%2?'triangle':'sine';o.frequency.value=f;o.detune.value=i*4;g.gain.value=.05;l.frequency.value=.07+i*.03;lg.gain.value=.03;l.connect(lg);lg.connect(g.gain);o.connect(g);g.connect(lp);o.start();l.start()})}
+function tone(f,d=.3,type='sine',v=.08,when=0,slide=0){if(!ac)return;const t0=ac.currentTime+when,o=ac.createOscillator(),g=ac.createGain();o.type=type;o.frequency.setValueAtTime(f,t0);if(slide)o.frequency.exponentialRampToValueAtTime(f*slide,t0+d);g.gain.setValueAtTime(.0001,t0);g.gain.exponentialRampToValueAtTime(v,t0+.02);g.gain.exponentialRampToValueAtTime(.0001,t0+d);o.connect(g);g.connect(master);o.start(t0);o.stop(t0+d+.05)}
+function noise(d,f0,f1,v=.12){if(!ac)return;const n=Math.floor(ac.sampleRate*d),b=ac.createBuffer(1,n,ac.sampleRate),a=b.getChannelData(0);for(let i=0;i<n;i++)a[i]=Math.random()*2-1;const sr=ac.createBufferSource();sr.buffer=b;const f=ac.createBiquadFilter(),g=ac.createGain(),t0=ac.currentTime;f.type='bandpass';f.Q.value=3;f.frequency.setValueAtTime(f0,t0);f.frequency.exponentialRampToValueAtTime(f1,t0+d);g.gain.setValueAtTime(.0001,t0);g.gain.exponentialRampToValueAtTime(v,t0+d*.4);g.gain.exponentialRampToValueAtTime(.0001,t0+d);sr.connect(f);f.connect(g);g.connect(master);sr.start()}
+const BASE={'00':261.6,'01':293.7,'10':329.6,'11':246.9};
+const S={
+ enter(){tone(392,.5,'sine',.1);tone(587,.6,'triangle',.07,.12)},
+ seal(){tone(180,.7,'sine',.14,0,3);[1568,2093,2637].forEach((f,i)=>tone(f,.5,'triangle',.05,.1+i*.09))},
+ cloud(){noise(2,250,3000,.16);[392,523,659].forEach((f,i)=>tone(f,.8,'sine',.06,.2+i*.25))},
+ quantum(){for(let i=0;i<8;i++)tone(300+i*90,.14,'square',.035,i*.2);tone(90,1.6,'sawtooth',.04,0,2)},
+ measure(){tone(1200,.08,'sine',.08);tone(600,.5,'triangle',.1,.9,.5);noise(.8,4000,300,.1)},
+ think(){let i=0;const id=setInterval(()=>tone(i++%2?640:520,.09,'triangle',.05),260);return()=>clearInterval(id)},
+ answer(st){const b=BASE[st]||261.6,m=(st==='10'||st==='11')?1.19:1.26;tone(b/2,1.8,'sine',.16);[1,m,1.5,2].forEach((r,i)=>tone(b*r,1.8,'triangle',.09,i*.08));noise(1.2,500,5000,.1)},
+ mail(){tone(988,.25,'sine',.1);tone(1318,.5,'sine',.1,.18)},
+ newQ(){[880,1109,1319,1760].forEach((f,i)=>tone(f,.6,'triangle',.07,i*.09))}};
+const sb=$('#snd'),paint=()=>{sb.textContent=soundOn?'🔊':'🔇';sb.setAttribute('aria-pressed',soundOn)};paint();
+sb.onclick=()=>{initAudio();soundOn=!soundOn;localStorage.setItem('snd',soundOn?'1':'0');master.gain.setTargetAtTime(soundOn?1:0,ac.currentTime,.1);paint()};
+addEventListener('pointerdown',e=>{if(!e.target.closest('#snd'))initAudio()});addEventListener('keydown',initAudio);
+function setLang(l){lang=l;localStorage.setItem('lang',l);document.documentElement.lang=l;document.documentElement.dir=l==='ar'?'rtl':'ltr';$('#lang').textContent=t().other}
+$('#lang').onclick=()=>{setLang(lang==='ar'?'en':'ar');view==='display'?display():start()};
+
+const crystal=(cls='')=>`<svg class="gem ${cls}" viewBox="0 0 400 520" role="img" aria-label="Oracle crystal">
+<ellipse class="ring" cx="200" cy="285" rx="185" ry="46" transform="rotate(-14 200 285)"/><ellipse class="ring" cx="200" cy="285" rx="160" ry="70" transform="rotate(20 200 285)"/>
+<ellipse cx="200" cy="500" rx="130" ry="14" fill="rgba(139,92,246,.45)"/>
+<use href="#gemShape" transform="translate(-70,165) scale(.52)"/><use href="#gemShape" transform="translate(262,200) scale(.46)"/>
+<use href="#gemShape"/>
+<g clip-path="url(#gemClip)"><circle cx="200" cy="250" r="110" fill="url(#core)" opacity=".8"/><rect class="shine" x="0" y="0" width="46" height="520" fill="rgba(255,255,255,.55)" transform="skewX(-18)"/></g>
+<g fill="#fff"><circle class="tw" cx="60" cy="90" r="3"/><circle class="tw" cx="345" cy="130" r="2.5"/><circle class="tw" cx="40" cy="330" r="2"/><circle class="tw" cx="360" cy="360" r="3"/><circle class="tw" cx="310" cy="40" r="2"/><circle class="tw" cx="100" cy="440" r="2.5"/></g></svg>`;
+
+const cv=$('#sky'),cx=cv.getContext('2d');let W,H,P=[];
+const rs=()=>{W=cv.width=innerWidth;H=cv.height=innerHeight;P=Array.from({length:90},()=>({x:Math.random()*W,y:Math.random()*H,r:Math.random()*1.8+.3,v:Math.random()*.3+.05}))};rs();addEventListener('resize',rs);
+(function f(){cx.clearRect(0,0,W,H);for(const p of P){p.y-=p.v;if(p.y<0)p.y=H;cx.fillStyle=`rgba(216,180,254,${.3+p.r/3})`;cx.beginPath();cx.arc(p.x,p.y,p.r,0,7);cx.fill()}requestAnimationFrame(f)})();
+
+const data={};let timer;
+function start(){clearTimeout(timer);for(const k in data)delete data[k];
+ app.innerHTML=`${crystal('big')}<div class="event"><div class="uni">BIRZEIT UNIVERSITY</div><div class="fest">QISKIT FALL FEST 2026</div><div class="theme">A Decade on the Cloud</div></div><h1>${t().title}</h1><p class="sub"><b>${t().tag}</b><br>${t().sub}</p><button id="go">${t().enter}</button><p class="sub" style="font-size:.8rem">${t().note}</p>`;
+ $('#go').onclick=()=>{S.enter();step1()}}
+function step1(){app.innerHTML=`<h2>${t().id}</h2><div class="glass"><label for="n">${t().name}</label><input id="n" autocomplete="name" maxlength="100"><label for="e">${t().email}</label><input id="e" type="email" dir="ltr" autocomplete="email"><div class="err" id="er" role="alert"></div><button id="nx">${t().next}</button></div>`;
+ $('#nx').onclick=()=>{const n=$('#n').value.trim(),e=$('#e').value.trim();if(!n)return $('#er').textContent=t().eName;if(!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(e))return $('#er').textContent=t().eMail;Object.assign(data,{name:n,email:e});step2()};$('#n').focus()}
+function step2(){app.innerHTML=`<h2>${t().seek}</h2><div class="glass"><textarea id="q" maxlength="500" dir="auto" placeholder="${t().ph}" aria-label="${t().seek}"></textarea>
+<div>${t().ex.map(x=>`<button class="ghost">${esc(x)}</button>`).join('')}</div>
+<label class="chk"><input type="checkbox" id="c1">${t().c1}</label><label class="chk"><input type="checkbox" id="c2">${t().c2}</label>
+<div class="err" id="er" role="alert"></div><button id="act">${t().act}</button></div>`;
+ app.querySelectorAll('.ghost').forEach(b=>b.onclick=()=>{$('#q').value=b.textContent});
+ $('#act').onclick=()=>{const q=$('#q').value.trim();if(q.length<3)return $('#er').textContent=t().eQ;if(!$('#c1').checked)return $('#er').textContent=t().eC;Object.assign(data,{question:q,consent:true,marketingConsent:$('#c2').checked});run()};$('#q').focus()}
+
+async function run(){
+ app.innerHTML=`${crystal()}<div class="journey">${t().jn.map((j,i)=>`<span class="node" id="j${i}">${j}</span>`).join('')}</div><div class="stage" id="st" aria-live="polite"></div><div class="mono" id="ci"></div>`;
+ const mark=i=>t().jn.forEach((_,k)=>{$('#j'+k).className='node'+(k<i?' done':k==i?' on':'')});
+ const req=fetch('/api/oracle/consult',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(data)})
+  .then(async r=>{const j=await r.json().catch(()=>({}));if(!r.ok||!j.ok)throw new Error(j.error||'error');return j}).catch(e=>({__err:e.message}));
+ for(const [j,s,d] of [[0,0,1400],[1,1,2200],[2,2,2000],[2,3,1600]]){mark(j);[S.seal,S.cloud,S.quantum,S.measure][s]();$('#st').textContent=t().st[s];$('#ci').textContent=s>=2?'|00⟩ ── H⊗H ── Measure':'';$('.gem').classList.add('pulse');await sleep(d);$('.gem').classList.remove('pulse')}
+ mark(3);$('#st').textContent=t().st[4];const stopThink=S.think();
+ const res=await req;stopThink();
+ if(res.__err){app.innerHTML=`<h2>${t().lost}</h2><p class="sub">${esc(res.__err)}</p><button id="rt">${t().retry}</button>`;$('#rt').onclick=step2;return}
+ app.innerHTML=`${crystal()}<h2>${t().spoke}</h2>
+ <div class="chips"><span class="chip">${t().state}: <span class="mono">|${res.state}⟩</span></span><span class="chip">${lang==='ar'?PN[res.state]:esc(res.personality)}</span><span class="chip">${lang==='ar'?(EN[res.energy]||esc(res.energy)):esc(res.energy)}</span></div>
+ <div class="answer" id="an" dir="${isAr(res.answer)?'rtl':'ltr'}"></div><p class="sub" id="em"></p><p class="sub">${t().thanks}</p><button id="nxt">${t().again}</button>`;
+ $('.gem').dataset.s=res.state;$('.gem').classList.add('pulse');S.answer(res.state);
+ const an=$('#an');for(let i=1;i<=res.answer.length;i++){an.textContent=res.answer.slice(0,i);await sleep(34)}
+ $('#em').textContent=res.emailSent?t().sent:t().notSent;if(res.emailSent)setTimeout(S.mail,500);
+ $('#nxt').onclick=start;timer=setTimeout(start,30000);
+}
+
+let lastAt=null,poll;
+function display(){clearInterval(poll);app.innerHTML=`${crystal('big')}<h2>${t().rem}</h2><p class="sub"><b id="cnt">0</b> ${t().asked}</p><div class="glass" style="text-align:center"><div class="sub">${t().latest}</div><div id="lq" class="stage" style="font-size:1.3rem" dir="auto"></div><div id="la" class="answer" style="font-size:1.6rem;min-height:0" dir="auto"></div></div>`;
+ async function tick(){try{const [p,s]=await Promise.all([fetch('/api/oracle/public').then(r=>r.json()),fetch('/api/oracle/stats').then(r=>r.json())]);
+  $('#cnt').textContent=s.totalConsultations||0;const d=p.display;
+  if(d&&d.createdAt!==lastAt){if(lastAt){S.newQ();$('.gem').classList.add('pulse');setTimeout(()=>$('.gem').classList.remove('pulse'),1100)}lastAt=d.createdAt;$('.gem').dataset.s=d.state;$('#lq').textContent=d.question;$('#la').textContent=d.answer}}catch{}}
+ tick();poll=setInterval(tick,3000)}
+
+setLang(lang);view==='display'?display():start();
+</script></body></html>
