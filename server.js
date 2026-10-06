@@ -215,7 +215,6 @@ You are the Quantum Oracle at a university Quantum Computing event.
 Event: Birzeit University - Qiskit Fall Fest 2026.
 Theme: "A Decade on the Cloud".
 Quantum Computing Club.
-Game Developer: Lana Daramna.
 
 You are entertaining, intelligent, mysterious, confident, and funny.
 
@@ -690,7 +689,7 @@ const L = {
     footerUni: 'Birzeit University',
     footerNote:
       'A fun, educational, quantum-inspired simulation. It does not predict the future or decide what is true.',
-    footerCredit: 'Game Developer: Lana Daramna',
+
   },
 
   ar: {
@@ -736,7 +735,7 @@ const L = {
     footerUni: 'جامعة بيرزيت',
     footerNote:
       'تجربة ترفيهية تعليمية مبنية على محاكاة كمّية. هي مش تنبؤ بالمستقبل وما بتقرر شو الصح.',
-    footerCredit: 'مطوّرة اللعبة: Lana Daramna',
+    
   },
 };
 
