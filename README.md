@@ -1,4 +1,4 @@
-# Quantum Oracle — Birzeit University, Qiskit Fall Fest 2026
+# Quantum Oracle  Birzeit University, Qiskit Fall Fest 2026
 Visitor asks a question → quantum-inspired simulation (2-qubit H⊗H) → personality/energy → Gemini answer → stored → emailed. Simulated quantum only.
 
 ## Run
