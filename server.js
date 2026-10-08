@@ -522,7 +522,7 @@ try {
   LOGO_B64 = fs
     .readFileSync(
       new URL(
-        './public/qcc-logo-email.png',
+        './public/qcc-logo.png',
         import.meta.url
       )
     )
@@ -556,13 +556,54 @@ const C = {
   lightBlue: '#E0F2FE',
   blue: '#075985',
   text: '#241B35',
-  muted: '#6B617A',
+  muted: '#4F4468',
   white: '#FFFFFF',
   pageBg: '#F5F3FF',
   cardBorder: '#E5E0F5',
   shadowColor: 'rgba(109,40,217,0.10)',
   gold: '#F59E0B',
 };
+
+
+// ---------- Dark-mode overrides (Apple Mail / iOS / Outlook.com) ----------
+// Gmail ignores custom dark CSS and inverts colours itself, so the light palette
+// above is high-contrast on purpose. These classes cover the clients that
+// honour prefers-color-scheme or the [data-ogsc]/[data-ogsb] attributes.
+const DARK_MAP = {
+  'qo-page':   { bg: '#0E0820' },
+  'qo-card':   { bg: '#1A1233', bd: '#4A3885' },
+  'qo-box':    { bg: '#2A1D54', bd: '#5B47A3' },
+  'qo-stat':   { bg: '#2A1D54', bd: '#5B47A3' },
+  'qo-gold':   { bg: '#33260E', bd: '#7A5E1C' },
+  'qo-sky':    { bg: '#0C2C44', bd: '#2A6E94' },
+  'qo-skybox': { bg: '#10405F', bd: '#3C86AE', fg: '#E3F4FF' },
+  'qo-btn':    { bg: '#8B5CF6' },
+  'qo-text':   { fg: '#FAF7FF' },
+  'qo-muted':  { fg: '#DDD3F3' },
+  'qo-h':      { fg: '#F1E8FF' },
+  'qo-accent': { fg: '#D2BBFF' },
+  'qo-gold-t': { fg: '#FBBF24' },
+  'qo-skyh':   { fg: '#B5E5FF' },
+  'qo-skyt':   { fg: '#E3F4FF' },
+  'qo-line':   { bd: '#4A3885' },
+};
+
+const DARK_CSS = (() => {
+  let media = '', ogsc = '', ogsb = '';
+  for (const [k, v] of Object.entries(DARK_MAP)) {
+    const d = [];
+    if (v.bg) d.push(`background:${v.bg} !important`, `background-color:${v.bg} !important`, 'background-image:none !important');
+    if (v.fg) d.push(`color:${v.fg} !important`);
+    if (v.bd) d.push(`border-color:${v.bd} !important`);
+    media += `.${k}{${d.join(';')}}\n`;
+    if (v.fg) ogsc += `[data-ogsc] .${k}{color:${v.fg} !important}\n`;
+    const b = [];
+    if (v.bg) b.push(`background-color:${v.bg} !important`, 'background-image:none !important');
+    if (v.bd) b.push(`border-color:${v.bd} !important`);
+    if (b.length) ogsb += `[data-ogsb] .${k}{${b.join(';')}}\n`;
+  }
+  return `@media (prefers-color-scheme: dark){\n${media}}\n${ogsc}${ogsb}`;
+})();
 
 // ---------- Playful quips ----------
 const QUIPS = {
@@ -705,7 +746,7 @@ const L = {
       '🎲 IN PLAIN WORDS',
 
     funText: (s) =>
-      `Two qubits, four possible states, one decision. Somewhere between |0⟩ and |1⟩, your answer took shape — state <b style="color:${C.darkPurple}">|${s}⟩</b> was the one that survived the measurement.`,
+      `Two qubits, four possible states, one decision. Somewhere between |0⟩ and |1⟩, your answer took shape — state <b class="qo-h" style="color:${C.darkPurple}">|${s}⟩</b> was the one that survived the measurement.`,
 
     dykLabel:
       '🧠 DID YOU KNOW?',
@@ -737,8 +778,7 @@ const L = {
     footerNote:
       'A fun, educational, quantum-inspired simulation. It does not predict the future or decide what is true.',
 
-    footerCredit:
-      'Game Developer: Lana Daramna',
+    
   },
 
   ar: {
@@ -788,7 +828,7 @@ const L = {
       '🎲 بالعربي المبسّط',
 
     funText: (s) =>
-      `كيوبتين، أربع حالات ممكنة، وقرار واحد. بين |0⟩ و|1⟩، جوابك أخد شكله — الحالة <b style="color:${C.darkPurple}" dir="ltr">|${s}⟩</b> هي اللي نجت من القياس.`,
+      `كيوبتين، أربع حالات ممكنة، وقرار واحد. بين |0⟩ و|1⟩، جوابك أخد شكله — الحالة <b class="qo-h" style="color:${C.darkPurple}" dir="ltr">|${s}⟩</b> هي اللي نجت من القياس.`,
 
     dykLabel:
       '🧠 هل تعلم؟',
@@ -820,8 +860,7 @@ const L = {
     footerNote:
       'تجربة ترفيهية تعليمية مبنية على محاكاة كمّية. هي مش تنبؤ بالمستقبل وما بتقرر شو الصح.',
 
-    footerCredit:
-      'مطوّرة اللعبة: Lana Daramna',
+    
   },
 };
 
@@ -931,1007 +970,203 @@ export function buildEmail(
     font,
   } = t;
 
-  const statCard = (
-    icon,
-    label,
-    value,
-    mono
-  ) => `
+  const statCard = (icon, label, value, mono) => `
     <td valign="top" width="33.33%" style="padding:0 4px">
-      <table role="presentation" width="100%" cellpadding="0" cellspacing="0"
-        style="background:${C.white};border-radius:14px;border:1px solid ${C.cardBorder}">
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" class="qo-stat"
+        bgcolor="${C.white}" style="background:${C.white};border-radius:14px;border:1px solid ${C.cardBorder}">
         <tr>
           <td align="center" style="padding:16px 8px 14px;text-align:center">
-            <div style="font-size:20px;line-height:1">${icon}</div>
-
-            <div style="font-size:10px;font-weight:bold;letter-spacing:1.2px;color:${C.muted};margin-top:8px;text-transform:uppercase">
-              ${label}
-            </div>
-
-            <div style="font-size:15px;font-weight:bold;color:${C.darkPurple};margin-top:6px;${
-              mono
-                ? 'font-family:monospace;direction:ltr;'
-                : ''
-            }">
-              ${value}
-            </div>
+            <div style="font-size:22px;line-height:1">${icon}</div>
+            <div class="qo-muted" style="font-size:11px;font-weight:bold;letter-spacing:1.2px;color:${C.muted};margin-top:8px;text-transform:uppercase">${label}</div>
+            <div class="qo-h" style="font-size:16px;font-weight:bold;color:${C.darkPurple};margin-top:6px;${mono ? 'font-family:monospace;direction:ltr;' : ''}">${value}</div>
           </td>
         </tr>
       </table>
     </td>`;
 
-  const ctaBlock =
-    env.EVENT_QR_URL
-      ? `
+  const ctaBlock = env.EVENT_QR_URL
+    ? `
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
       <tr>
         <td align="center" style="padding:30px 24px 8px">
-
-          <div style="font-size:12px;font-weight:bold;letter-spacing:1.5px;color:${C.purple};text-transform:uppercase;margin-bottom:14px">
-            ${t.ctaLabel}
-          </div>
-
+          <div class="qo-accent" style="font-size:12px;font-weight:bold;letter-spacing:1.5px;color:${C.purple};text-transform:uppercase;margin-bottom:14px">${t.ctaLabel}</div>
           <table role="presentation" cellpadding="0" cellspacing="0">
             <tr>
-              <td align="center" bgcolor="${C.purple}"
-                style="background:${C.purple};border-radius:999px">
-
-                <a href="${esc(env.EVENT_QR_URL)}"
-                  style="display:inline-block;padding:15px 34px;font-size:15px;font-weight:bold;color:${C.white};text-decoration:none;letter-spacing:0.5px;border-radius:999px">
-                  ${t.ctaBtn}
-                </a>
-
+              <td align="center" bgcolor="${C.purple}" class="qo-btn" style="background:${C.purple};border-radius:999px">
+                <a href="${esc(env.EVENT_QR_URL)}" style="display:inline-block;padding:15px 34px;font-size:15px;font-weight:bold;color:#FFFFFF;text-decoration:none;letter-spacing:0.5px;border-radius:999px">${t.ctaBtn}</a>
               </td>
             </tr>
           </table>
-
-          <div style="font-size:13px;color:${C.muted};margin-top:14px">
-            ${t.ctaSub}
-          </div>
-
+          <div class="qo-muted" style="font-size:14px;color:${C.muted};margin-top:14px">${t.ctaSub}</div>
         </td>
       </tr>
     </table>`
-      : '';
+    : '';
 
-  const html = `
-<!DOCTYPE html>
-<html lang="${lang}" dir="${dir}">
+  const html = `<!DOCTYPE html>
+<html lang="${lang}" dir="${dir}" xmlns="http://www.w3.org/1999/xhtml">
 <head>
-
 <meta charset="UTF-8">
-
-<meta
-  name="viewport"
-  content="width=device-width,initial-scale=1"
->
-
-<meta
-  name="color-scheme"
-  content="light"
->
-
-<title>
-  ${esc(
-    lang === 'ar'
-      ? `🔮 ${visitor.name}، العرّاف الكمّي حكى!`
-      : `🔮 ${visitor.name}, the Oracle has spoken!`
-  )}
-</title>
-
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="x-apple-disable-message-reformatting">
+<meta name="color-scheme" content="light dark">
+<meta name="supported-color-schemes" content="light dark">
+<title>${esc(lang === 'ar' ? `🔮 ${visitor.name}، العرّاف الكمّي حكى!` : `🔮 ${visitor.name}, the Oracle has spoken!`)}</title>
+<style>
+:root{color-scheme:light dark;supported-color-schemes:light dark}
+body,table,td{-webkit-text-size-adjust:100%;-ms-text-size-adjust:100%}
+${DARK_CSS}
+</style>
 </head>
+<body class="qo-page qo-text" bgcolor="${C.pageBg}" style="margin:0;padding:0;background:${C.pageBg};font-family:${font};color:${C.text}">
 
-<body
-  style="
-    margin:0;
-    padding:0;
-    background:${C.pageBg};
-    font-family:${font};
-    color:${C.text};
-    -webkit-text-size-adjust:100%;
-  "
->
+<div style="display:none;max-height:0;overflow:hidden;opacity:0;color:${C.pageBg}">${esc(lang === 'ar' ? 'جوابك جوّا، ومعك معلومة كمّية.' : 'Your answer is inside, plus a quantum fact worth sharing.')}</div>
 
-<div
-  style="
-    display:none;
-    max-height:0;
-    overflow:hidden;
-    opacity:0;
-    color:${C.pageBg};
-  "
->
-  ${esc(
-    lang === 'ar'
-      ? 'جوابك جوّا، ومعك معلومة كمّية.'
-      : 'Your answer is inside, plus a quantum fact worth sharing.'
-  )}
-</div>
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" class="qo-page" bgcolor="${C.pageBg}" style="background:${C.pageBg}">
+<tr><td align="center" style="padding:24px 12px">
 
-<table
-  role="presentation"
-  width="100%"
-  cellpadding="0"
-  cellspacing="0"
-  bgcolor="${C.pageBg}"
-  style="background:${C.pageBg}"
->
-
-<tr>
-
-<td
-  align="center"
-  style="padding:24px 12px"
->
-
-<table
-  role="presentation"
-  width="600"
-  cellpadding="0"
-  cellspacing="0"
-  dir="${dir}"
-  style="width:100%;max-width:600px"
->
+<table role="presentation" width="600" cellpadding="0" cellspacing="0" dir="${dir}" style="width:100%;max-width:600px">
 
 <!-- HERO -->
-
 <tr>
-
-<td
-  align="center"
-  style="
-    background:${C.purple};
-    background-image:linear-gradient(
-      135deg,
-      ${C.purple} 0%,
-      ${C.darkPurple} 100%
-    );
-    border-radius:24px 24px 0 0;
-    padding:34px 28px 30px;
-    text-align:center
-  "
->
-
-${
-  LOGO_B64
-    ? `
-<img
-  src="cid:${LOGO_CID}"
-  width="80"
-  height="80"
-  alt="Quantum Computing Club"
-  style="
-    display:block;
-    margin:0 auto 14px;
-    border:0;
-    border-radius:50%;
-    width:80px;
-    height:80px
-  "
->
-`
-    : ''
-}
-
-<div
-  style="
-    display:inline-block;
-    background:rgba(255,255,255,0.18);
-    color:#EDE9FE;
-    font-size:10px;
-    font-weight:bold;
-    letter-spacing:1.5px;
-    padding:7px 16px;
-    border-radius:999px;
-    text-transform:uppercase
-  "
->
-  ${t.brandSmall}
-</div>
-
-<div
-  style="
-    font-size:38px;
-    font-weight:900;
-    color:#FFFFFF;
-    letter-spacing:1.5px;
-    margin-top:18px;
-    line-height:1.15
-  "
->
-  ${t.gameTitle}
-</div>
-
-<div
-  style="
-    font-size:16px;
-    color:#E9DFFF;
-    margin-top:12px;
-    line-height:1.5;
-    font-weight:500
-  "
->
-  ${t.heroLine}
-</div>
-
-<div
-  style="
-    font-size:11px;
-    color:#C7B3F2;
-    letter-spacing:2px;
-    text-transform:uppercase;
-    margin-top:14px
-  "
->
-  ${t.heroSub}
-</div>
-
-<div
-  dir="ltr"
-  style="
-    font-size:16px;
-    color:#D5C4F7;
-    letter-spacing:8px;
-    margin-top:18px;
-    line-height:1;
-    direction:ltr;
-    unicode-bidi:isolate
-  "
->
-  &#10216;0| &nbsp;&nbsp; &#10216;1|
-</div>
-
+<td align="center" bgcolor="${C.darkPurple}" style="background:${C.darkPurple};background-image:linear-gradient(135deg,${C.purple} 0%,${C.darkPurple} 100%);border-radius:24px 24px 0 0;padding:34px 28px 30px;text-align:center">
+${LOGO_B64 ? `<img src="cid:${LOGO_CID}" width="80" height="80" alt="Quantum Computing Club" style="display:block;margin:0 auto 14px;border:0;border-radius:50%;width:80px;height:80px">` : ''}
+<div style="display:inline-block;background:rgba(255,255,255,0.20);color:#FFFFFF;font-size:11px;font-weight:bold;letter-spacing:1.5px;padding:7px 16px;border-radius:999px;text-transform:uppercase">${t.brandSmall}</div>
+<div style="font-size:38px;font-weight:900;color:#FFFFFF;letter-spacing:1.5px;margin-top:18px;line-height:1.15">${t.gameTitle}</div>
+<div style="font-size:17px;color:#F1EAFF;margin-top:12px;line-height:1.5;font-weight:600">${t.heroLine}</div>
+<div style="font-size:12px;color:#E4D8FF;letter-spacing:2px;text-transform:uppercase;margin-top:14px">${t.heroSub}</div>
+<div dir="ltr" style="font-size:16px;color:#E4D8FF;letter-spacing:8px;margin-top:18px;line-height:1;direction:ltr;unicode-bidi:isolate">&#10216;0| &nbsp;&nbsp; &#10216;1|</div>
 </td>
-
 </tr>
 
 <!-- BODY CARD -->
-
 <tr>
-
-<td
-  style="
-    background:${C.white};
-    border-radius:0 0 24px 24px;
-    border:1px solid ${C.cardBorder};
-    border-top:none
-  "
->
+<td class="qo-card qo-line" bgcolor="${C.white}" style="background:${C.white};border-radius:0 0 24px 24px;border:1px solid ${C.cardBorder};border-top:none">
 
 <!-- GREETING -->
-
-<table
-  role="presentation"
-  width="100%"
-  cellpadding="0"
-  cellspacing="0"
->
-
-<tr>
-
-<td
-  style="
-    padding:34px 32px 6px;
-    text-align:${align}
-  "
->
-
-<div
-  style="
-    font-size:26px;
-    font-weight:800;
-    color:${C.darkPurple};
-    line-height:1.3
-  "
->
-  ${t.greeting(name)}
-</div>
-
-<div
-  style="
-    font-size:15px;
-    line-height:1.7;
-    color:${C.muted};
-    margin-top:10px
-  "
->
-  ${t.greetMsg}
-</div>
-
-</td>
-
-</tr>
-
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+<tr><td style="padding:34px 32px 6px;text-align:${align}">
+<div class="qo-h" style="font-size:27px;font-weight:800;color:${C.darkPurple};line-height:1.3">${t.greeting(name)}</div>
+<div class="qo-muted" style="font-size:16px;line-height:1.7;color:${C.muted};margin-top:10px">${t.greetMsg}</div>
+</td></tr>
 </table>
 
 <!-- QUESTION -->
-
-<table
-  role="presentation"
-  width="100%"
-  cellpadding="0"
-  cellspacing="0"
->
-
-<tr>
-
-<td
-  style="
-    padding:22px 32px 0;
-    text-align:${align}
-  "
->
-
-<div
-  style="
-    font-size:11px;
-    font-weight:bold;
-    letter-spacing:1.5px;
-    color:${C.muted};
-    text-transform:uppercase;
-    margin-bottom:10px
-  "
->
-  ${t.qLabel}
-</div>
-
-<table
-  role="presentation"
-  width="100%"
-  cellpadding="0"
-  cellspacing="0"
-  style="
-    background:${C.lightLavender};
-    border-radius:16px;
-    border:1px solid ${C.lavender}
-  "
->
-
-<tr>
-
-<td
-  style="
-    padding:18px 22px;
-    text-align:${align}
-  "
->
-
-<div
-  style="
-    font-size:17px;
-    line-height:1.6;
-    color:${C.text};
-    font-weight:500;
-    font-style:italic
-  "
->
-  “${q}”
-</div>
-
-</td>
-
-</tr>
-
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+<tr><td style="padding:22px 32px 0;text-align:${align}">
+<div class="qo-muted" style="font-size:12px;font-weight:bold;letter-spacing:1.5px;color:${C.muted};text-transform:uppercase;margin-bottom:10px">${t.qLabel}</div>
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" class="qo-box" bgcolor="${C.lightLavender}" style="background:${C.lightLavender};border-radius:16px;border:1px solid ${C.lavender}">
+<tr><td style="padding:18px 22px;text-align:${align}">
+<div class="qo-text" style="font-size:18px;line-height:1.6;color:${C.text};font-weight:600;font-style:italic">“${q}”</div>
+</td></tr>
 </table>
-
-</td>
-
-</tr>
-
+</td></tr>
 </table>
 
 <!-- ORACLE ANSWER -->
-
-<table
-  role="presentation"
-  width="100%"
-  cellpadding="0"
-  cellspacing="0"
->
-
-<tr>
-
-<td
-  style="
-    padding:26px 24px 0
-  "
->
-
-<table
-  role="presentation"
-  width="100%"
-  cellpadding="0"
-  cellspacing="0"
-  style="
-    background:${C.purple};
-    background-image:linear-gradient(
-      135deg,
-      ${C.purple} 0%,
-      ${C.darkPurple} 100%
-    );
-    border-radius:22px
-  "
->
-
-<tr>
-
-<td
-  align="center"
-  style="
-    padding:36px 26px 34px;
-    text-align:center
-  "
->
-
-<div
-  style="
-    font-size:12px;
-    font-weight:bold;
-    letter-spacing:2.5px;
-    color:#E9DFFF;
-    text-transform:uppercase
-  "
->
-  ${t.answerLabel}
-</div>
-
-<div
-  style="
-    font-size:34px;
-    font-weight:900;
-    color:#FFFFFF;
-    line-height:1.25;
-    margin-top:18px;
-    letter-spacing:0.3px
-  "
->
-  ${ans}
-</div>
-
-<div
-  style="
-    height:2px;
-    width:60px;
-    background:rgba(255,255,255,0.35);
-    margin:22px auto 0;
-    border-radius:2px
-  "
-></div>
-
-<div
-  style="
-    font-size:14px;
-    color:#E5D8FF;
-    margin-top:18px;
-    line-height:1.6;
-    font-style:italic
-  "
->
-  ${esc(quip)}
-</div>
-
-</td>
-
-</tr>
-
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+<tr><td style="padding:26px 24px 0">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" bgcolor="${C.darkPurple}" style="background:${C.darkPurple};background-image:linear-gradient(135deg,${C.purple} 0%,${C.darkPurple} 100%);border-radius:22px;border:1px solid #8B5CF6">
+<tr><td align="center" style="padding:36px 26px 34px;text-align:center">
+<div style="font-size:13px;font-weight:bold;letter-spacing:2.5px;color:#F1EAFF;text-transform:uppercase">${t.answerLabel}</div>
+<div style="font-size:34px;font-weight:900;color:#FFFFFF;line-height:1.3;margin-top:18px;letter-spacing:0.3px">${ans}</div>
+<div style="height:2px;width:60px;background:rgba(255,255,255,0.45);margin:22px auto 0;border-radius:2px"></div>
+<div style="font-size:15px;color:#F1EAFF;margin-top:18px;line-height:1.6;font-style:italic">${esc(quip)}</div>
+</td></tr>
 </table>
-
-</td>
-
-</tr>
-
+</td></tr>
 </table>
 
 <!-- QUANTUM RESULT -->
-
-<table
-  role="presentation"
-  width="100%"
-  cellpadding="0"
-  cellspacing="0"
->
-
-<tr>
-
-<td
-  style="
-    padding:30px 32px 0;
-    text-align:${align}
-  "
->
-
-<div
-  style="
-    font-size:12px;
-    font-weight:bold;
-    letter-spacing:1.5px;
-    color:${C.muted};
-    text-transform:uppercase;
-    margin-bottom:14px
-  "
->
-  ${t.resultLabel}
-</div>
-
-</td>
-
-</tr>
-
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+<tr><td style="padding:30px 32px 0;text-align:${align}">
+<div class="qo-muted" style="font-size:13px;font-weight:bold;letter-spacing:1.5px;color:${C.muted};text-transform:uppercase;margin-bottom:14px">${t.resultLabel}</div>
+</td></tr>
 </table>
-
-<table
-  role="presentation"
-  width="100%"
-  cellpadding="0"
-  cellspacing="0"
-  style="padding:0 28px"
->
-
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="padding:0 28px">
 <tr>
-
-${statCard(
-  '⚛️',
-  t.stateLabel,
-  `|${s}⟩`,
-  true
-)}
-
-${statCard(
-  '🔮',
-  t.oracleLabel,
-  pers,
-  false
-)}
-
-${statCard(
-  '⚡',
-  t.energyLabel,
-  energy,
-  false
-)}
-
+${statCard('⚛️', t.stateLabel, `|${s}⟩`, true)}
+${statCard('🔮', t.oracleLabel, pers, false)}
+${statCard('⚡', t.energyLabel, energy, false)}
 </tr>
-
 </table>
 
 <!-- PLAIN WORDS -->
-
-<table
-  role="presentation"
-  width="100%"
-  cellpadding="0"
-  cellspacing="0"
->
-
-<tr>
-
-<td
-  style="padding:24px 32px 0"
->
-
-<table
-  role="presentation"
-  width="100%"
-  cellpadding="0"
-  cellspacing="0"
-  style="
-    background:${C.lightLavender};
-    border-radius:14px;
-    border:1px dashed ${C.lavender}
-  "
->
-
-<tr>
-
-<td
-  style="
-    padding:18px 22px;
-    text-align:${align}
-  "
->
-
-<div
-  style="
-    font-size:11px;
-    font-weight:bold;
-    letter-spacing:1.5px;
-    color:${C.purple};
-    text-transform:uppercase;
-    margin-bottom:8px
-  "
->
-  ${t.funLabel}
-</div>
-
-<div
-  style="
-    font-size:14px;
-    line-height:1.7;
-    color:${C.text}
-  "
->
-  ${t.funText(s)}
-</div>
-
-</td>
-
-</tr>
-
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+<tr><td style="padding:24px 32px 0">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" class="qo-box" bgcolor="${C.lightLavender}" style="background:${C.lightLavender};border-radius:14px;border:1px dashed #B9A6E8">
+<tr><td style="padding:18px 22px;text-align:${align}">
+<div class="qo-accent" style="font-size:12px;font-weight:bold;letter-spacing:1.5px;color:${C.purple};text-transform:uppercase;margin-bottom:8px">${t.funLabel}</div>
+<div class="qo-text" style="font-size:15px;line-height:1.7;color:${C.text}">${t.funText(s)}</div>
+</td></tr>
 </table>
-
-</td>
-
-</tr>
-
+</td></tr>
 </table>
 
 <!-- DID YOU KNOW -->
-
-<table
-  role="presentation"
-  width="100%"
-  cellpadding="0"
-  cellspacing="0"
->
-
-<tr>
-
-<td
-  style="padding:26px 32px 0"
->
-
-<table
-  role="presentation"
-  width="100%"
-  cellpadding="0"
-  cellspacing="0"
-  style="
-    background:#FEF9EE;
-    border:1px solid #FDE9BF;
-    border-radius:16px
-  "
->
-
-<tr>
-
-<td
-  style="
-    padding:22px 24px;
-    text-align:${align}
-  "
->
-
-<div
-  style="
-    font-size:12px;
-    font-weight:bold;
-    letter-spacing:1.5px;
-    color:${C.gold};
-    text-transform:uppercase
-  "
->
-  ${t.dykLabel}
-</div>
-
-<div
-  style="
-    font-size:18px;
-    font-weight:800;
-    color:${C.darkPurple};
-    margin-top:10px;
-    line-height:1.35
-  "
->
-  ${esc(fact.t)}
-</div>
-
-<div
-  style="
-    font-size:14px;
-    line-height:1.7;
-    color:${C.text};
-    margin-top:10px
-  "
->
-  ${esc(fact.f)}
-</div>
-
-<div
-  style="
-    font-size:13px;
-    line-height:1.7;
-    color:${C.blue};
-    margin-top:12px;
-    background:${C.lightBlue};
-    padding:12px 14px;
-    border-radius:10px;
-    border:1px solid #BAE6FD
-  "
->
-  <b>☁️</b> ${esc(fact.c)}
-</div>
-
-<div
-  style="
-    font-size:14px;
-    font-weight:bold;
-    color:${C.purple};
-    margin-top:14px
-  "
->
-  ${esc(fact.h)}
-</div>
-
-</td>
-
-</tr>
-
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+<tr><td style="padding:26px 32px 0">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" class="qo-gold" bgcolor="#FEF9EE" style="background:#FEF9EE;border:1px solid #F3D9A0;border-radius:16px">
+<tr><td style="padding:22px 24px;text-align:${align}">
+<div class="qo-gold-t" style="font-size:13px;font-weight:bold;letter-spacing:1.5px;color:#B45309;text-transform:uppercase">${t.dykLabel}</div>
+<div class="qo-h" style="font-size:19px;font-weight:800;color:${C.darkPurple};margin-top:10px;line-height:1.35">${esc(fact.t)}</div>
+<div class="qo-text" style="font-size:15px;line-height:1.7;color:${C.text};margin-top:10px">${esc(fact.f)}</div>
+<div class="qo-skybox" style="font-size:14px;line-height:1.7;color:${C.blue};margin-top:12px;background:${C.lightBlue};padding:12px 14px;border-radius:10px;border:1px solid #93C9EE"><b>☁️</b> ${esc(fact.c)}</div>
+<div class="qo-accent" style="font-size:15px;font-weight:bold;color:${C.purple};margin-top:14px">${esc(fact.h)}</div>
+</td></tr>
 </table>
-
-</td>
-
-</tr>
-
+</td></tr>
 </table>
 
 <!-- CLOUD -->
-
-<table
-  role="presentation"
-  width="100%"
-  cellpadding="0"
-  cellspacing="0"
->
-
-<tr>
-
-<td
-  style="padding:26px 32px 0"
->
-
-<table
-  role="presentation"
-  width="100%"
-  cellpadding="0"
-  cellspacing="0"
-  style="
-    background:${C.lightBlue};
-    background-image:linear-gradient(
-      135deg,
-      ${C.lightBlue} 0%,
-      #F0F9FF 100%
-    );
-    border-radius:16px;
-    border:1px solid #BAE6FD
-  "
->
-
-<tr>
-
-<td
-  style="
-    padding:22px 24px;
-    text-align:${align}
-  "
->
-
-<div
-  style="
-    font-size:12px;
-    font-weight:bold;
-    letter-spacing:1.5px;
-    color:${C.blue};
-    text-transform:uppercase
-  "
->
-  ${t.cloudLabel}
-</div>
-
-<div
-  style="
-    font-size:17px;
-    font-weight:800;
-    color:${C.blue};
-    margin-top:8px;
-    line-height:1.35
-  "
->
-  ${theme}
-</div>
-
-<div
-  style="
-    font-size:14px;
-    line-height:1.7;
-    color:#0C4A6E;
-    margin-top:10px
-  "
->
-  ${t.cloudText}
-</div>
-
-</td>
-
-</tr>
-
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+<tr><td style="padding:26px 32px 0">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" class="qo-sky" bgcolor="${C.lightBlue}" style="background:${C.lightBlue};border-radius:16px;border:1px solid #93C9EE">
+<tr><td style="padding:22px 24px;text-align:${align}">
+<div class="qo-skyh" style="font-size:13px;font-weight:bold;letter-spacing:1.5px;color:${C.blue};text-transform:uppercase">${t.cloudLabel}</div>
+<div class="qo-skyh" style="font-size:18px;font-weight:800;color:${C.blue};margin-top:8px;line-height:1.35">${theme}</div>
+<div class="qo-skyt" style="font-size:15px;line-height:1.7;color:#0C4A6E;margin-top:10px">${t.cloudText}</div>
+</td></tr>
 </table>
-
-</td>
-
-</tr>
-
+</td></tr>
 </table>
 
 <!-- CTA -->
-
 ${ctaBlock}
 
 <!-- QISKIT LINK -->
-
-<table
-  role="presentation"
-  width="100%"
-  cellpadding="0"
-  cellspacing="0"
->
-
-<tr>
-
-<td
-  align="center"
-  style="padding:22px 32px 0"
->
-
-<a
-  href="https://qiskit.org"
-  style="
-    color:${C.purple};
-    font-size:14px;
-    font-weight:bold;
-    text-decoration:underline
-  "
->
-  ${t.qiskitLink}
-</a>
-
-</td>
-
-</tr>
-
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+<tr><td align="center" style="padding:22px 32px 0">
+<a class="qo-accent" href="https://qiskit.org" style="color:${C.purple};font-size:15px;font-weight:bold;text-decoration:underline">${t.qiskitLink}</a>
+</td></tr>
 </table>
 
 <!-- FOOTER -->
-
-<table
-  role="presentation"
-  width="100%"
-  cellpadding="0"
-  cellspacing="0"
->
-
-<tr>
-
-<td
-  style="
-    padding:30px 32px 34px;
-    text-align:${align}
-  "
->
-
-<div
-  style="
-    border-top:1px solid ${C.cardBorder};
-    padding-top:20px
-  "
->
-
-<div
-  style="
-    font-size:14px;
-    font-weight:800;
-    color:${C.darkPurple};
-    line-height:1.4
-  "
->
-  ${t.footerOrg}
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+<tr><td style="padding:30px 32px 34px;text-align:${align}">
+<div class="qo-line" style="border-top:1px solid ${C.cardBorder};padding-top:20px">
+<div class="qo-h" style="font-size:15px;font-weight:800;color:${C.darkPurple};line-height:1.4">${t.footerOrg}</div>
+<div class="qo-muted" style="font-size:14px;color:${C.muted};margin-top:2px">${t.footerUni}</div>
+<div class="qo-muted" style="font-size:13px;color:${C.muted};line-height:1.8;margin-top:14px"><span class="qo-accent" style="color:${C.purple};font-weight:bold">${ev}</span> · ${theme}</div>
+<div class="qo-muted" style="font-size:13px;color:${C.muted};margin-top:14px;line-height:1.7">${t.footerNote}</div>
+<div class="qo-h" style="font-size:14px;font-weight:bold;color:${C.darkPurple};margin-top:16px">✨ ${t.footerCredit}</div>
 </div>
-
-<div
-  style="
-    font-size:13px;
-    color:${C.muted};
-    margin-top:2px
-  "
->
-  ${t.footerUni}
-</div>
-
-<div
-  style="
-    font-size:12px;
-    color:${C.muted};
-    line-height:1.8;
-    margin-top:14px
-  "
->
-  <span
-    style="
-      color:${C.purple};
-      font-weight:bold
-    "
-  >
-    ${ev}
-  </span>
-  · ${theme}
-</div>
-
-<div
-  style="
-    font-size:12px;
-    color:${C.muted};
-    margin-top:14px;
-    line-height:1.7
-  "
->
-  ${t.footerNote}
-</div>
-
-<div
-  style="
-    font-size:13px;
-    font-weight:bold;
-    color:${C.darkPurple};
-    margin-top:16px
-  "
->
-  ✨ ${t.footerCredit}
-</div>
-
-</div>
-
-</td>
-
-</tr>
-
+</td></tr>
 </table>
 
 </td>
-
 </tr>
+
+<tr><td align="center" style="padding:18px 12px 0;font-size:11px">&nbsp;</td></tr>
 
 </table>
 
-</td>
-
-</tr>
-
-<tr>
-
-<td
-  align="center"
-  style="
-    padding:18px 12px 0;
-    font-size:11px;
-    color:${C.muted}
-  "
->
-  &nbsp;
-</td>
-
-</tr>
-
-</table>
-
-</td>
-
-</tr>
-
+</td></tr>
 </table>
 
 </body>
-
-</html>
-`;
+</html>`;
 
   const strip = (h) =>
     String(h).replace(
@@ -2643,6 +1878,10 @@ app.post(
         save();
       }
 
+      // Mystery mode: when the email was delivered, the answer is NOT sent to the
+      // screen. The visitor can still choose to reveal it (POST /api/oracle/reveal).
+      const sealed = !demo && session.emailSent === true;
+
       res.json({
         ok: true,
 
@@ -2656,7 +1895,9 @@ app.post(
           qr.state,
 
         answer:
-          text,
+          sealed ? null : text,
+
+        sealed,
 
         circuit:
           qr.circuit,
@@ -2706,6 +1947,29 @@ app.post(
             'THE ORACLE LOST CONNECTION TO THE CLOUD. Please try again.',
         });
     }
+  }
+);
+
+// ---------- Reveal (optional, visitor's choice) ----------
+// The answer is withheld from the screen when the email was delivered.
+// The visitor may ask to see it anyway; the session id is an unguessable UUID
+// and the window is short, so strangers cannot pull other people's answers.
+const REVEAL_WINDOW_MS = 15 * 60 * 1000;
+app.post(
+  '/api/oracle/reveal',
+  limit(20, 60000),
+  (req, res) => {
+    const id = String((req.body || {}).id || '');
+    const s = db.sessions.find((x) => x.id === id);
+    if (
+      !s ||
+      s.demo ||
+      !s.emailSent ||
+      Date.now() - new Date(s.createdAt).getTime() > REVEAL_WINDOW_MS
+    ) {
+      return res.status(404).json({ ok: false, error: 'Nothing to reveal.' });
+    }
+    res.json({ ok: true, answer: s.aiResponse });
   }
 );
 

@@ -43,6 +43,8 @@ label.chk input{width:20px;margin:3px 0}
 .gem .shine{animation:shine 4.5s ease-in-out infinite}
 .gem .ring{fill:none;stroke:rgba(192,132,252,.55);stroke-width:1.5}
 .gem .tw{animation:tw 2.4s ease-in-out infinite}.gem .tw:nth-child(2n){animation-delay:.9s}.gem .tw:nth-child(3n){animation-delay:1.6s}
+.gem.sealed{animation:float 6s ease-in-out infinite,breathe 3s ease-in-out infinite}
+@keyframes breathe{50%{filter:drop-shadow(0 0 85px #67e8f9) brightness(1.3)}}
 @keyframes float{50%{transform:translateY(-16px)}}
 @keyframes pulse{40%{filter:drop-shadow(0 0 110px #67e8f9) brightness(1.6)}}
 @keyframes shine{0%,35%{transform:translateX(-160px)}70%,100%{transform:translateX(330px)}}
@@ -90,7 +92,7 @@ ex:['Should I learn quantum computing?','Frontend or backend?','Should I join th
 st:['QUESTION SEALED','CONNECTING TO THE CLOUD','QUANTUM STATE INITIALIZING','MEASURING...','THE ORACLE IS LISTENING...'],
 jn:['Question','☁ Cloud','⚛ Quantum','🔮 Oracle'],spoke:'THE ORACLE HAS SPOKEN',state:'Quantum state',sent:'Your answer was sealed. Check your inbox.',notSent:'The Oracle’s answer is above, but the email could not reach your inbox.',
 thanks:'Thank you for consulting the Oracle.',again:'NEXT VISITOR',retry:'Try again',lost:'THE ORACLE LOST CONNECTION TO THE CLOUD',rem:'THE ORACLE REMEMBERS',asked:'questions answered',latest:'The latest anonymous question',
-other:'العربية'},
+other:'العربية',sealedTitle:'THE ORACLE HAS SEALED YOUR ANSWER',sealedMsg:'It was sent to your inbox. Only you can open it.',sealedHint:'Check your inbox (and spam). Too curious to wait?',reveal:'👁 Reveal it here',revealErr:'The seal would not break. Check your inbox instead.'},
 ar:{enter:'ادخل إلى العرّاف',tag:'اسأل السؤال. ادخل إلى عالم الكوانتم.',sub:'اسأل سؤالك، والحالة الكمّية بتحدد الجواب.',note:'محاكاة مستوحاة من الكوانتم · متصلة بالسحابة · للمتعة والتعلّم',title:'العرّاف الكمّي',
 id:'عرّفنا عن نفسك',name:'اسمك',email:'بريدك الإلكتروني',next:'متابعة',seek:'شو بدك تعرف؟',ph:'اسأل العرّاف أي شي... أو اختار بين خيارين',
 c1:'أوافق على حفظ اسمي وبريدي وسؤالي وجواب العرّاف لهذه الفعالية.',c2:'أرغب باستقبال أخبار فعاليات نادي الحوسبة الكمّية.',act:'فعّل العرّاف',
@@ -99,32 +101,56 @@ ex:['أتعلم الحوسبة الكمّية؟','أختار frontend ولا bac
 st:['تم ختم سؤالك','جاري الاتصال بالسحابة','تهيئة الحالة الكمّية','جاري القياس...','العرّاف يُصغي...'],
 jn:['السؤال','☁ السحابة','⚛ الكوانتم','🔮 العرّاف'],spoke:'العرّاف قال كلمته',state:'الحالة الكمّية',sent:'تم ختم إجابتك. تفقّد بريدك.',notSent:'جواب العرّاف فوق، بس الرسالة ما وصلت لبريدك.',
 thanks:'شكراً لأنك استشرت العرّاف.',again:'الزائر التالي',retry:'حاول مرة ثانية',lost:'العرّاف فقد الاتصال بالسحابة',rem:'العرّاف يتذكّر',asked:'سؤال تمت الإجابة عنه',latest:'آخر سؤال (مجهول الهوية)',
-other:'English'}};
+other:'English',sealedTitle:'العرّاف ختم جوابك',sealedMsg:'انبعت على بريدك الإلكتروني. وبس إنت اللي بتفتحه.',sealedHint:'تفقّد بريدك (وتفقّد الـ spam). فضولك ما بيستنى؟',reveal:'👁 أظهره هون',revealErr:'الختم ما انفتح. تفقّد بريدك بدل هيك.'}};
 const PN={'00':'الحكيم','01':'المتفائل','10':'المتحدّي','11':'المتشكّك'},EN={COSMIC:'كونية',ELECTRIC:'كهربائية',MYSTERIOUS:'غامضة',CHAOTIC:'فوضوية',SERENE:'هادئة'};
 const t=()=>T[lang],isAr=s=>/[\u0600-\u06FF]/.test(s||''),esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const sleep=ms=>new Promise(r=>setTimeout(r,ms));
-/* ---- sound engine (starts on first user gesture; toggle top-right) ---- */
-let ac,master,soundOn=localStorage.getItem('snd')!=='0';
+/* ---- sound engine v2: louder, layered, reactive. Starts on first gesture; toggle top-right ---- */
+let ac,master,comp,bus,verb,drone,droneLP,soundOn=localStorage.getItem('snd')!=='0';
+const LEVEL=2.2,VOL=2.4; // LEVEL = master loudness, VOL = per-sound boost; the compressor stops clipping
+const AC_=window.AudioContext||window.webkitAudioContext;
+function impulse(sec,decay){const n=Math.floor(ac.sampleRate*sec),b=ac.createBuffer(2,n,ac.sampleRate);for(let c=0;c<2;c++){const d=b.getChannelData(c);for(let i=0;i<n;i++)d[i]=(Math.random()*2-1)*Math.pow(1-i/n,decay)}return b}
 function initAudio(){if(ac){if(ac.state==='suspended')ac.resume();return}
- ac=new (window.AudioContext||window.webkitAudioContext)();master=ac.createGain();master.gain.value=soundOn?1:0;master.connect(ac.destination);
- const lp=ac.createBiquadFilter();lp.type='lowpass';lp.frequency.value=700;lp.connect(master);
- [55,82.4,110,164.8].forEach((f,i)=>{const o=ac.createOscillator(),g=ac.createGain(),l=ac.createOscillator(),lg=ac.createGain();o.type=i%2?'triangle':'sine';o.frequency.value=f;o.detune.value=i*4;g.gain.value=.05;l.frequency.value=.07+i*.03;lg.gain.value=.03;l.connect(lg);lg.connect(g.gain);o.connect(g);g.connect(lp);o.start();l.start()})}
-function tone(f,d=.3,type='sine',v=.08,when=0,slide=0){if(!ac)return;const t0=ac.currentTime+when,o=ac.createOscillator(),g=ac.createGain();o.type=type;o.frequency.setValueAtTime(f,t0);if(slide)o.frequency.exponentialRampToValueAtTime(f*slide,t0+d);g.gain.setValueAtTime(.0001,t0);g.gain.exponentialRampToValueAtTime(v,t0+.02);g.gain.exponentialRampToValueAtTime(.0001,t0+d);o.connect(g);g.connect(master);o.start(t0);o.stop(t0+d+.05)}
-function noise(d,f0,f1,v=.12){if(!ac)return;const n=Math.floor(ac.sampleRate*d),b=ac.createBuffer(1,n,ac.sampleRate),a=b.getChannelData(0);for(let i=0;i<n;i++)a[i]=Math.random()*2-1;const sr=ac.createBufferSource();sr.buffer=b;const f=ac.createBiquadFilter(),g=ac.createGain(),t0=ac.currentTime;f.type='bandpass';f.Q.value=3;f.frequency.setValueAtTime(f0,t0);f.frequency.exponentialRampToValueAtTime(f1,t0+d);g.gain.setValueAtTime(.0001,t0);g.gain.exponentialRampToValueAtTime(v,t0+d*.4);g.gain.exponentialRampToValueAtTime(.0001,t0+d);sr.connect(f);f.connect(g);g.connect(master);sr.start()}
-const BASE={'00':261.6,'01':293.7,'10':329.6,'11':246.9};
+ ac=new AC_();
+ comp=ac.createDynamicsCompressor();comp.threshold.value=-16;comp.knee.value=24;comp.ratio.value=8;comp.attack.value=.004;comp.release.value=.28;
+ master=ac.createGain();master.gain.value=soundOn?LEVEL:0;master.connect(comp);comp.connect(ac.destination);
+ bus=ac.createGain();bus.connect(master);
+ verb=ac.createConvolver();verb.buffer=impulse(3,2.4);const vg=ac.createGain();vg.gain.value=.5;bus.connect(verb);verb.connect(vg);vg.connect(master);
+ droneLP=ac.createBiquadFilter();droneLP.type='lowpass';droneLP.frequency.value=700;droneLP.Q.value=2;
+ drone=ac.createGain();drone.gain.value=.5;droneLP.connect(drone);drone.connect(bus);
+ [55,82.4,110,164.8,220].forEach((f,i)=>{const o=ac.createOscillator(),g=ac.createGain(),l=ac.createOscillator(),lg=ac.createGain();o.type=i%2?'triangle':'sine';o.frequency.value=f;o.detune.value=i*5;g.gain.value=.1;l.frequency.value=.07+i*.03;lg.gain.value=.05;l.connect(lg);lg.connect(g.gain);o.connect(g);g.connect(droneLP);o.start();l.start()})}
+/* mood(0..1): the ambient drone opens up and gets louder as the tension rises */
+function mood(x,secs=1){if(!ac)return;const t0=ac.currentTime;droneLP.frequency.setTargetAtTime(500+x*2800,t0,secs/3);drone.gain.setTargetAtTime(.4+x*.9,t0,secs/3)}
+function duck(d){if(!ac)return;const t0=ac.currentTime;drone.gain.cancelScheduledValues(t0);drone.gain.setTargetAtTime(.04,t0,.04);drone.gain.setTargetAtTime(.6,t0+d,.4)}
+function tone(f,d=.3,type='sine',v=.08,when=0,slide=0){if(!ac)return;const t0=ac.currentTime+when,o=ac.createOscillator(),g=ac.createGain();o.type=type;o.frequency.setValueAtTime(f,t0);if(slide)o.frequency.exponentialRampToValueAtTime(Math.max(20,f*slide),t0+d);g.gain.setValueAtTime(.0001,t0);g.gain.exponentialRampToValueAtTime(v*VOL,t0+.015);g.gain.exponentialRampToValueAtTime(.0001,t0+d);o.connect(g);g.connect(bus);o.start(t0);o.stop(t0+d+.05)}
+function noise(d,f0,f1,v=.12,when=0){if(!ac)return;const n=Math.floor(ac.sampleRate*d),b=ac.createBuffer(1,n,ac.sampleRate),a=b.getChannelData(0);for(let i=0;i<n;i++)a[i]=Math.random()*2-1;const sr=ac.createBufferSource();sr.buffer=b;const f=ac.createBiquadFilter(),g=ac.createGain(),t0=ac.currentTime+when;f.type='bandpass';f.Q.value=3;f.frequency.setValueAtTime(f0,t0);f.frequency.exponentialRampToValueAtTime(f1,t0+d);g.gain.setValueAtTime(.0001,t0);g.gain.exponentialRampToValueAtTime(v*VOL,t0+d*.4);g.gain.exponentialRampToValueAtTime(.0001,t0+d);sr.connect(f);f.connect(g);g.connect(bus);sr.start(t0)}
+const thump=(v=.5,when=0)=>{tone(70,.3,'sine',v,when,.45);tone(140,.12,'triangle',v*.3,when,.5)};
+const BASE={'00':261.6,'01':293.7,'10':329.6,'11':246.9},PENT=[1,1.125,1.25,1.5,1.667,2,2.25,2.5,3];
 const S={
- enter(){tone(392,.5,'sine',.1);tone(587,.6,'triangle',.07,.12)},
- seal(){tone(180,.7,'sine',.14,0,3);[1568,2093,2637].forEach((f,i)=>tone(f,.5,'triangle',.05,.1+i*.09))},
- cloud(){noise(2,250,3000,.16);[392,523,659].forEach((f,i)=>tone(f,.8,'sine',.06,.2+i*.25))},
- quantum(){for(let i=0;i<8;i++)tone(300+i*90,.14,'square',.035,i*.2);tone(90,1.6,'sawtooth',.04,0,2)},
- measure(){tone(1200,.08,'sine',.08);tone(600,.5,'triangle',.1,.9,.5);noise(.8,4000,300,.1)},
- think(){let i=0;const id=setInterval(()=>tone(i++%2?640:520,.09,'triangle',.05),260);return()=>clearInterval(id)},
- answer(st){const b=BASE[st]||261.6,m=(st==='10'||st==='11')?1.19:1.26;tone(b/2,1.8,'sine',.16);[1,m,1.5,2].forEach((r,i)=>tone(b*r,1.8,'triangle',.09,i*.08));noise(1.2,500,5000,.1)},
- mail(){tone(988,.25,'sine',.1);tone(1318,.5,'sine',.1,.18)},
- newQ(){[880,1109,1319,1760].forEach((f,i)=>tone(f,.6,'triangle',.07,i*.09))}};
+ enter(){mood(.35,.8);tone(392,.7,'sine',.14);tone(587,.8,'triangle',.1,.12);tone(784,.9,'sine',.07,.26);noise(.7,300,2500,.08)},
+ seal(){mood(.45,.6);thump(.7);tone(180,.8,'sine',.2,0,3);[1568,2093,2637,3136].forEach((f,i)=>tone(f,.6,'triangle',.07,.1+i*.09))},
+ cloud(){mood(.6,1);noise(2.2,250,3500,.22);[392,523,659,784].forEach((f,i)=>tone(f,1,'sine',.1,.2+i*.25));tone(110,2,'sawtooth',.05,0,2)},
+ quantum(){mood(.9,1.5);for(let i=0;i<12;i++)tone(300+i*80,.16,'square',.05,i*.15);tone(80,2,'sawtooth',.07,0,8);noise(1.9,400,6000,.16);thump(.4,.2);thump(.5,1)},
+ measure(){mood(1,.3);tone(1400,.1,'sine',.14);noise(.9,5000,200,.2);tone(900,.7,'triangle',.14,.1,.35);duck(1.1)},
+ think(){let n=0,stop=false;const beat=()=>{if(stop)return;thump(.65);thump(.5,.2);if(n%2===0)tone(1400+Math.random()*1600,.35,'sine',.04,.3);mood(Math.min(1,.7+n*.03),.4);n++;setTimeout(beat,Math.max(480,950-n*45))};beat();return()=>{stop=true}},
+ /* the reveal: sub boom, bright chord, then a shower of sparkles in the key of the quantum state */
+ answer(st){const b=BASE[st]||261.6,m=(st==='10'||st==='11')?1.19:1.26;mood(.5,1.5);
+  tone(52,2.4,'sine',.5,0,.55);noise(1.4,300,7000,.22);
+  [.5,1,m,1.5,2].forEach((r,i)=>tone(b*r,2.6,i%2?'triangle':'sine',.14,i*.07));
+  for(let i=0;i<10;i++)tone(b*2*PENT[Math.floor(Math.random()*PENT.length)],.7,'sine',.06,.5+i*.14)},
+ /* sealed: a lock clicks shut, a low mysterious swell, then the envelope whooshes away */
+ sealed(){mood(.4,1.5);tone(2400,.05,'square',.06);tone(1700,.07,'square',.05,.06);tone(65,2.4,'sine',.4,.1,.7);
+  [196,233.1,293.7].forEach((f,i)=>tone(f,2.4,'triangle',.07,.2+i*.2));noise(1.1,500,5500,.14,.5)},
+ mail(){tone(988,.35,'sine',.2);tone(1318,.7,'sine',.2,.18);tone(1976,.9,'sine',.1,.34)},
+ fail(){tone(440,.4,'triangle',.18);tone(370,.4,'triangle',.18,.22);tone(294,.8,'triangle',.18,.44)},
+ click(){tone(1100,.07,'sine',.07);tone(1650,.06,'sine',.04,.03)},
+ key(){tone(1900+Math.random()*500,.035,'triangle',.025)},
+ type(){tone(2400+Math.random()*900,.05,'sine',.05)},
+ newQ(){[880,1109,1319,1760].forEach((f,i)=>tone(f,.8,'triangle',.12,i*.09));thump(.4)}};
 const sb=$('#snd'),paint=()=>{sb.textContent=soundOn?'🔊':'🔇';sb.setAttribute('aria-pressed',soundOn)};paint();
-sb.onclick=()=>{initAudio();soundOn=!soundOn;localStorage.setItem('snd',soundOn?'1':'0');master.gain.setTargetAtTime(soundOn?1:0,ac.currentTime,.1);paint()};
-addEventListener('pointerdown',e=>{if(!e.target.closest('#snd'))initAudio()});addEventListener('keydown',initAudio);
+sb.onclick=()=>{initAudio();soundOn=!soundOn;localStorage.setItem('snd',soundOn?'1':'0');master.gain.setTargetAtTime(soundOn?LEVEL:0,ac.currentTime,.1);paint();if(soundOn)S.click()};
+addEventListener('pointerdown',e=>{if(e.target.closest('#snd'))return;initAudio();const b=e.target.closest('button');if(b&&!['go','act'].includes(b.id))S.click()});
+addEventListener('keydown',e=>{initAudio();if(e.target.matches&&e.target.matches('input,textarea')&&e.key.length===1)S.key()});
 function setLang(l){lang=l;localStorage.setItem('lang',l);document.documentElement.lang=l;document.documentElement.dir=l==='ar'?'rtl':'ltr';$('#lang').textContent=t().other}
 $('#lang').onclick=()=>{setLang(lang==='ar'?'en':'ar');view==='display'?display():start()};
 
@@ -162,13 +188,31 @@ async function run(){
  mark(3);$('#st').textContent=t().st[4];const stopThink=S.think();
  const res=await req;stopThink();
  if(res.__err){app.innerHTML=`<h2>${t().lost}</h2><p class="sub">${esc(res.__err)}</p><button id="rt">${t().retry}</button>`;$('#rt').onclick=step2;return}
+ if(res.sealed)return showSealed(res);
+ return showAnswer(res,false);
+}
+const mask=e=>{const [u,d]=String(e||'').split('@');return d?u.slice(0,1)+'•••@'+d:''};
+function showSealed(res){
+ app.innerHTML=`${crystal('big sealed')}<h2>${t().sealedTitle}</h2><p class="sub" style="font-size:1.15rem">${t().sealedMsg}</p>
+ <div class="chips"><span class="chip mono">✉ ${esc(mask(data.email))}</span></div><p class="sub">${t().sealedHint}</p>
+ <div><button class="ghost" id="rv">${t().reveal}</button></div><p class="err" id="rverr" role="alert"></p><button id="nxt">${t().again}</button>`;
+ S.sealed();setTimeout(S.mail,1100);
+ $('#rv').onclick=async()=>{$('#rv').disabled=true;
+  try{const r=await fetch('/api/oracle/reveal',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({id:res.id})}),j=await r.json();if(!r.ok||!j.ok)throw 0;clearTimeout(timer);showAnswer({...res,answer:j.answer,sealed:false},true)}
+  catch{$('#rv').disabled=false;$('#rverr').textContent=t().revealErr;S.fail()}};
+ $('#nxt').onclick=start;timer=setTimeout(start,45000);
+}
+async function showAnswer(res,revealed){
  app.innerHTML=`${crystal()}<h2>${t().spoke}</h2>
  <div class="chips"><span class="chip">${t().state}: <span class="mono">|${res.state}⟩</span></span><span class="chip">${lang==='ar'?PN[res.state]:esc(res.personality)}</span><span class="chip">${lang==='ar'?(EN[res.energy]||esc(res.energy)):esc(res.energy)}</span></div>
  <div class="answer" id="an" dir="${isAr(res.answer)?'rtl':'ltr'}"></div><p class="sub" id="em"></p><p class="sub">${t().thanks}</p><button id="nxt">${t().again}</button>`;
  $('.gem').dataset.s=res.state;$('.gem').classList.add('pulse');S.answer(res.state);
- const an=$('#an');for(let i=1;i<=res.answer.length;i++){an.textContent=res.answer.slice(0,i);await sleep(34)}
- $('#em').textContent=res.emailSent?t().sent:t().notSent;if(res.emailSent)setTimeout(S.mail,500);
- $('#nxt').onclick=start;timer=setTimeout(start,30000);
+ $('#nxt').onclick=start;timer=setTimeout(start,60000);
+ const an=$('#an');for(let i=1;i<=res.answer.length;i++){an.textContent=res.answer.slice(0,i);if(i%2===0)S.type();await sleep(34)}
+ if(revealed||res.emailSent)$('#em').textContent=t().sent;
+ else{$('#em').textContent=t().notSent;S.fail()}
+ if(!revealed&&res.emailSent)setTimeout(S.mail,500);
+ clearTimeout(timer);timer=setTimeout(start,30000);
 }
 
 let lastAt=null,poll;
